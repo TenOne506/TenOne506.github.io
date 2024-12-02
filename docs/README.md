@@ -6,10 +6,16 @@ config:
     type: hero
     full: true
     background: tint-plate
+  # -
+  #   type: banner
+  #   banner: https://api.pengzhanbo.cn/wallpaper/bing
+    bannerMask:
+      light: 0.1
+      dark: 0.3
     hero:
-      name: Theme Plume
-      tagline: VuePress Next Theme
-      text: 一个简约的，功能丰富的 vuepress 文档&博客 主题
+      name: 研究生自救之路
+      tagline: 救赎之道，就在其中
+      text: 预计在未来一年学习和找工作期间更新笔记。
       actions:
         -
           theme: brand
@@ -18,5 +24,5 @@ config:
         -
           theme: alt
           text: Github →
-          link: https://github.com/pengzhanbo/vuepress-theme-plume
+          link: https://github.com/TenOne506
 ---
