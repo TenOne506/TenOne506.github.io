@@ -1,7 +1,7 @@
 import { viteBundler } from '@vuepress/bundler-vite'
 import { defineUserConfig } from 'vuepress'
 import { plumeTheme } from 'vuepress-theme-plume'
-
+import { codeToTokens } from 'shiki'
 export default defineUserConfig({
   base: '/',
   lang: 'zh-CN',
