@@ -13,16 +13,8 @@ export default defineUserConfig({
 	theme: plumeTheme({
 		// 添加您的部署域名
 		// hostname: 'https://your_site_url',
-		profile: {
-      name: 'Wyf',
-      description: 'AAHPH',
-      avatar: '/blogger.png',
-      location: '您的位置',
-      organization: 'HIT',
-      circle: true, // 是否为圆形头像
-      layout: 'right'// 个人信息在左侧还是右侧，'left' | 'right'
-    },
-		changelog: {
+
+	changelog: {
       maxCount: 10,
       repoUrl: 'https://github.com/TenOne506/TenOne506.github.io',
       commitUrlPattern: ':repo/commit/:hash',

@@ -13,19 +13,21 @@ export default defineThemeConfig({
 
   appearance: true,
 
-  profile: {
-    avatar: 'https://theme-plume.vuejs.press/plume.png',
-    name: 'My Vuepress Site',
-    description: 'My Blog',
-    // circle: true,
-    // location: '',
-    // organization: '',
+	profile: {
+    
+    avatar: 'plume.svg',
+    name: 'mit wyf',
+    description: 'AAHPH',
+    circle: true,
+    location: '中国',
+    organization: '哈尔滨工业大学',
+    layout: 'right',
   },
 
   navbar,
   notes,
   social: [
-    { icon: 'github', link: '/' },
+    { icon: 'github', link: 'https://github.com/TenOne506/' },
   ],
 
 })
