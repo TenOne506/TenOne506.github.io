@@ -20,7 +20,7 @@ export default defineUserConfig({
       location: '您的位置',
       organization: 'HIT',
       circle: true, // 是否为圆形头像
-      layout: 'right', // 个人信息在左侧还是右侧，'left' | 'right'
+      layout: 'right'// 个人信息在左侧还是右侧，'left' | 'right'
     },
 		changelog: {
       maxCount: 10,
