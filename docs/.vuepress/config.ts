@@ -13,8 +13,15 @@ export default defineUserConfig({
 	theme: plumeTheme({
 		// 添加您的部署域名
 		// hostname: 'https://your_site_url',
-
+		changelog: {
+      maxCount: 10,
+      repoUrl: 'https://github.com/TenOne506/TenOne506.github.io',
+      commitUrlPattern: ':repo/commit/:hash',
+      issueUrlPattern: ':repo/issues/:issue',
+      tagUrlPattern: ':repo/releases/tag/:tag'
+    },
 		plugins: {
+			git: process.env.NODE_ENV === 'production',
 			/**
 			 * Shiki 代码高亮
 			 * @see https://theme-plume.vuejs.press/config/plugins/code-highlight/
