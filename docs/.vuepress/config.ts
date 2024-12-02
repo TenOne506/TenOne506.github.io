@@ -14,7 +14,15 @@ export default defineUserConfig({
 		// 添加您的部署域名
 		// hostname: 'https://your_site_url',
 
+	changelog: {
+      maxCount: 10,
+      repoUrl: 'https://github.com/TenOne506/TenOne506.github.io',
+      commitUrlPattern: ':repo/commit/:hash',
+      issueUrlPattern: ':repo/issues/:issue',
+      tagUrlPattern: ':repo/releases/tag/:tag'
+    },
 		plugins: {
+			git: process.env.NODE_ENV === 'production',
 			/**
 			 * Shiki 代码高亮
 			 * @see https://theme-plume.vuejs.press/config/plugins/code-highlight/
@@ -23,6 +31,7 @@ export default defineUserConfig({
 				theme: { light: 'vitesse-light', dark: 'vitesse-dark' },
 				//强烈建议预设代码块高亮语言，插件默认加载所有语言会产生不必要的时间开销
 				languages: ['shell', 'bash', 'c++', 'c','python'],
+				lineNumbers: true
 			},
 
 			/**

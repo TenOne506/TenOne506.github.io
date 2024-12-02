@@ -1,7 +1,9 @@
-export const redirects = JSON.parse("{\"/preview/custom-component.example.html\":\"/article/b4qf25le/\",\"/preview/markdown.html\":\"/article/cre8vxts/\",\"/notes/demo/bar.html\":\"/demo/g2tvk6f4/\",\"/notes/demo/foo.html\":\"/demo/2mscnzci/\",\"/notes/demo/\":\"/demo/\"}")
+export const redirects = JSON.parse("{\"/gpu/%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95%E4%BB%8E0%E5%BC%80%E5%A7%8B%E4%BC%98%E5%8C%96%E5%88%B0cutlas.html\":\"/article/vwx36sni/\",\"/interviwew/%E5%AE%9E%E4%B9%A0%E9%9D%A2%E7%BB%8F.html\":\"/article/nj965itp/\",\"/preview/custom-component.example.html\":\"/article/b4qf25le/\",\"/preview/markdown.html\":\"/article/cre8vxts/\",\"/notes/demo/bar.html\":\"/demo/g2tvk6f4/\",\"/notes/demo/foo.html\":\"/demo/2mscnzci/\",\"/notes/demo/\":\"/demo/\"}")
 
 export const routes = Object.fromEntries([
   ["/", { loader: () => import(/* webpackChunkName: "index.html" */"D:/Blog/docs/.vuepress/.temp/pages/index.html.js"), meta: {"title":""} }],
+  ["/article/vwx36sni/", { loader: () => import(/* webpackChunkName: "article_vwx36sni_index.html" */"D:/Blog/docs/.vuepress/.temp/pages/article/vwx36sni/index.html.js"), meta: {"title":"矩阵乘法从0开始优化到cutlas"} }],
+  ["/article/nj965itp/", { loader: () => import(/* webpackChunkName: "article_nj965itp_index.html" */"D:/Blog/docs/.vuepress/.temp/pages/article/nj965itp/index.html.js"), meta: {"title":"实习面经"} }],
   ["/article/b4qf25le/", { loader: () => import(/* webpackChunkName: "article_b4qf25le_index.html" */"D:/Blog/docs/.vuepress/.temp/pages/article/b4qf25le/index.html.js"), meta: {"title":"自定义组件"} }],
   ["/article/cre8vxts/", { loader: () => import(/* webpackChunkName: "article_cre8vxts_index.html" */"D:/Blog/docs/.vuepress/.temp/pages/article/cre8vxts/index.html.js"), meta: {"title":"Markdown"} }],
   ["/demo/g2tvk6f4/", { loader: () => import(/* webpackChunkName: "demo_g2tvk6f4_index.html" */"D:/Blog/docs/.vuepress/.temp/pages/demo/g2tvk6f4/index.html.js"), meta: {"title":"bar"} }],
