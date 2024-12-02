@@ -2,13 +2,13 @@
 pageLayout: home
 externalLinkIcon: false
 config:
-  # -
-  #   type: hero
-  #   full: true
-  #   background: tint-plate
   -
-    type: banner
-    banner: https://api.pengzhanbo.cn/wallpaper/bing
+    type: hero
+    full: true
+    background: tint-plate
+  # -
+  #   type: banner
+  #   banner: https://api.pengzhanbo.cn/wallpaper/bing
     bannerMask:
       light: 0.1
       dark: 0.3
