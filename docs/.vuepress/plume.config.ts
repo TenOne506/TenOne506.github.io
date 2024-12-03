@@ -15,12 +15,12 @@ export default defineThemeConfig({
 
 	profile: {
     
-    avatar: 'plume.svg',
-    name: 'mit wyf',
-    description: 'AAHPH',
+    avatar: 'avatar.jpg',
+    name: 'Peter Park',
+    description: '天下谁人不识君',
     circle: true,
     location: '中国',
-    organization: '哈尔滨工业大学',
+    organization: 'HIT',
     layout: 'right',
   },
 
@@ -28,6 +28,7 @@ export default defineThemeConfig({
   notes,
   social: [
     { icon: 'github', link: 'https://github.com/TenOne506/' },
+    {icon: 'qq', link: '/'}
   ],
 
 })
