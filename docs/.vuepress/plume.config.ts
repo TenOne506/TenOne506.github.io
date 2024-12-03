@@ -16,11 +16,11 @@ export default defineThemeConfig({
 	profile: {
     
     avatar: 'plume.svg',
-    name: 'mit wyf',
+    name: 'Tgc',
     description: 'AAHPH',
     circle: true,
     location: '中国',
-    organization: '哈尔滨工业大学',
+    organization: '二附中',
     layout: 'right',
   },
 
@@ -28,6 +28,7 @@ export default defineThemeConfig({
   notes,
   social: [
     { icon: 'github', link: 'https://github.com/TenOne506/' },
+    {icon: 'qq', link: '/'}
   ],
 
 })
