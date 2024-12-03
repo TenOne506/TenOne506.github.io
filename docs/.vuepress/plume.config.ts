@@ -16,11 +16,11 @@ export default defineThemeConfig({
 	profile: {
     
     avatar: 'plume.svg',
-    name: 'Tgc',
-    description: 'AAHPH',
+    name: 'Wyf',
+    description: '天下谁人不识君',
     circle: true,
     location: '中国',
-    organization: '二附中',
+    organization: 'HIT',
     layout: 'right',
   },
 
