@@ -6,9 +6,22 @@ config:
     type: hero
     full: true
     background: tint-plate
+    tintPlate:
+      r:
+        value: 220
+        offset: 36
+      g:
+        value: 220
+        offset: 36
+      b:
+        value: 220
+        offset: 36
   # -
-  #   type: banner
-  #   banner: https://api.pengzhanbo.cn/wallpaper/bing
+    # type: banner
+    # full: true
+    # background: tint-plate
+    # banner: 'xiaominiubei.png'
+    # backgroundAttachment: local
     bannerMask:
       light: 0.1
       dark: 0.3
@@ -19,7 +32,7 @@ config:
       actions:
         -
           theme: brand
-          text: 博客
+          text: 记录
           link: /blog/
         -
           theme: alt

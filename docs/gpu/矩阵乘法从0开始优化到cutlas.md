@@ -277,6 +277,17 @@ __global__ void matrixKernel(float *dA, float *dB, float *dC, int M, int K, int 
 
 
 ### **最具重量级的优化Cutlas源码实现**
+- 把 GEMM 转化为外积计算，输出的 M x N 分成 tile，各 tile 之间的计算是互不影响的，可以并行。为每一个 tile 分配一个 threadblock 计算
+- 因为直接访问显存 （Global Memory）latency 很高，并且每个数据都会重复使用。所以把数据先搬运到更高速的存储上，再继续处理
+- 输入矩阵因为要做频繁的累加计算，放在最快的寄存器（Register File）上
+  - Register File 是对每个线程私有的
+- A，B 矩阵的数据因为需要被各线程共享，放到 Shared Memory 上
+::: demo-wrapper img
+<div style="display: flex; justify-content: center; align-items: center;">
+  <img src="/Gemm/threadblock.png" alt="示例图片">
+</div>
+:::
+
 A,B 矩阵一般一次只加载一部分到SMEM(限于SMEM size),这里在 K 维上有个循环,是 GEMM 的主循环。主循环内加载数据和计算可以 overlap,形成一个 pipeline,用计算掩盖数据访问的耗时。如下图所示：
 ::: demo-wrapper img no-padding 
 ![](/Gemm/pipline.png)
@@ -285,9 +296,13 @@ A,B 矩阵一般一次只加载一部分到SMEM(限于SMEM size),这里在 K 维
   1. 主循环的一轮开始前,load from Global Memory,调用一次 _syncthreads(),保证 shared memory 是加载好的
   2. 主循环中,对 warp tile 也在 k 维上有一个循环(内层循环),在内层循环每一轮中 load from Shared Memory 和调用 warp-level mma 是 overlap 的
 - _syncthreads() 是一个 barrier,当同一个 threadblock (不是 warp)中的所有 thread 都达到_syncthreads() 的位置时,才会继续执行
-- - 从 Shared Memory 读取数据到 Register File,再继续进行计算
+- 从 Shared Memory 读取数据到 Register File,再继续进行计算
 ::: demo-wrapper img no-padding 
 ![](/Gemm/cutlass.png)
+:::
+- 从 Shared Memory 读取数据到 Register File，再继续进行计算
+::: demo-wrapper img no-padding 
+![](/Gemm/wrap.png)
 :::
 #### **Cutlass 如何解决 bank conflicts**
 ::: demo-wrapper img no-padding 
@@ -296,19 +311,14 @@ A,B 矩阵一般一次只加载一部分到SMEM(限于SMEM size),这里在 K 维
 - 上图中,A矩阵从 Global Memory 加载到 Shared Memory,然后调用 ldmatrix 指令加载到 Register File,最后用 Tensor Core 指令计算
 - 每个方块(每个线程)对应 128 bit 数据,所以 warp 中线程分为 4 个 phase 执行访存,Shared Memory 共有 8 个 128 bit 的 bank
 - A矩阵是 Column Major,因此在从 Global Memory 中读取时,每个 phase 读两列,写到 Shared Memory 也是写前两列
+- 线程中 SMEM 指针和目标寄存器的排列如上图右侧所示。
 ::: demo-wrapper img no-padding 
 ![](/Gemm/solvebank2.png)
 :::
 - 上面是英伟达GTC大会PPT上的截图。至于图中的Shared Memory 的读和写一定有一个会 bank conflict。\
-自己想的还不是特别明白.~~我觉得应该特指**Global Memory时Col Major的情况**。因为感觉如果都是Row Major的情况下，Store和Read都不会产生bankconflict，在已经分阶段处理的情况下。这段话还是要结合下面load to register的部分来看。~~
-上面的分析大概率是错的， 这边暂时没搞明白。过几日再更新吧。
-  - ~~如果 Shared Memory 按照 Col Major写入读取。Store时不冲突,Read时冲突。~~
-    <!-- - 看上图中的例子，如果内存布局不变，T0-T7的加载没有bankconflict。但是读取引发了冲突
-    - 改变布局之后，加载和读取都没有引发冲突。 -->
-  - ~~如果 Shared Memory 是 Row Major写入读取,Store的时候不会冲突,Read时不会冲突。~~
-    <!-- - 如果内存布局不变，T0-T7 的加载存在bankconflict。但是读取不会引发了冲突
-    - 改变布局之后，加载和读取都没有引发冲突。 -->
-  - ~~这边其实有点烧脑，有点绕，但我感觉英伟达官方就是这个意思吧，或者能力有限只能理解到这里了。~~
+自己想的还不是特别明白。
+- 参考<Icon name="skill-icons:github-dark" size="2em" />[Cutlass链接](https://github.com/NVIDIA/cutlass/blob/main/media/docs/implicit_gemm_convolution.md)
+- 大概的意思就是，为了后续从share memory 到 register的load过程避免bank conflict
 - 解决方法
   - 按照下面的方式重排,Shared Memory 为 Row Major
     - Store 时,一个 phase 内的线程写入到一行,因为是 Row Major,不会 bank conflict
@@ -316,8 +326,33 @@ A,B 矩阵一般一次只加载一部分到SMEM(限于SMEM size),这里在 K 维
 ::: demo-wrapper img no-padding 
 ![](/Gemm/solvebank3.png)
 :::
+在图中，一个 warp 范围的内存访问以蓝色突出显示，单个线程加载一个 128 位向量。全局内存中的 tile 可以对应于 activations 或 filters，并假设是 “strip-mineed” 的，有四个线程加载连续的通道。\
+共享内存可视化为“行优先”矩阵，其中八列表示 八个 128 位 SoundBank 的调用。如果每个 WARP 满足以下条件，则对共享内存的访问将是无冲突的：
+- {T0， T1， ..， T7} 不访问同一个 128 位bank
+- {T8， T9， ..， T15} 不访问同一个 128 位bank
+- {T16， T17， ..， T23} 不要访问同一个 128 位bank
+- {T24， T25， ..， T31} 不访问同一个 128 位bank \
+为了实现无冲突存储，Shared Memory 布局重新映射了 strip-mineed 排列以转置向量，并对每个线程指针的列索引应用 XOR 操作。具体说来
+```c++
+  int store_column = (lane_id % 8) ^ (lane_id / 8);
+```
+布局上的这种转换将有助于从共享内存读取数据切片，以使用 Tensor Core 计算 warp 级矩阵乘法。
+
 下一步是从share memory 到 register的load过程避免bank conflict
 ::: demo-wrapper img no-padding 
 ![](/Gemm/toregister.png)
 :::
-## **至此先告一段落,期待后续更新优化 2024.12.2**
+上图显示了参与 ldmatrix 指令的前 8 个线程如何在逻辑上映射到共享内存中矩阵的 C=0..31 切片。此切片在代码中称为 “k-group”，因为它对应于 warp 级矩阵乘法的相同 K-index。
+<br>例如，为了加载上图右侧的矩阵，LDMATRIX 会在“线程块平铺的逻辑视图”中加载前 8 个 128b 向量，标记为 T0-T7。这些对应于“从全局/存储加载到共享”图中的 T0、T4、T8、T12、T16、T20、T24、T28。如果没有排列布局，T0、T8、T16、T24 都将位于列/组 0 中，而 T4、T12、T20、T28 都将位于列 4 中。
+<br>要前进到共享内存中的下一个 “k-group”，请按照以下顺序使用 XOR 操作更新指针。
+- ^1 从 k=0 前进到 k=1
+- ^3 从 k=1 到 k=2
+- ^1 从 k=2 前进到 k=3
+- ^3 从 k=3 前进到 k=0
+  
+这些过渡中的第一个如下所示
+::: demo-wrapper img 
+![](/Gemm/xor1.png)
+![](/Gemm/xor2.png)
+:::
+## **至此先告一段落,期待后续更新优化 2024.12.3**
