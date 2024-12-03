@@ -22,7 +22,7 @@ void matirixSerial(float* A,float* B,float* C,int M,int K,int N){
 }
 ```
 ### **Nvidia CUDA 简单并行化矩阵乘法**
-如果有GPU的前置知识的话这个也很容易理解并写出来,后面应该会更新简单说一说GPU的编程模型。上文的乘法,则是一个CPU核心计算了所有工作。为了加速计算,我们希望通过多线程的方式来进行加速,即SIMT（Single Instruction Multiple Thread）单指令多线程。在这里,就一句话来说,将任务分为多个线程,给CUDA Core去执行。
+如果有GPU的前置知识的话这个也很容易理解并写出来,后面应该会更新简单说一说GPU的编程模型。上文的乘法,则是一个CPU核心计算了所有工作。为了加速计算,我们希望通过多线程的方式来进行加速,即SIMT(Single Instruction Multiple Thread)单指令多线程。在这里,就一句话来说,将任务分为多个线程,给CUDA Core去执行。
 ``` c++
 __global__ void matrixKernel(float *dA, float *dB, float *dC, int M, int K, int N){
   // 获取线程的唯一ID
@@ -37,7 +37,7 @@ __global__ void matrixKernel(float *dA, float *dB, float *dC, int M, int K, int 
   }
 }
 ```
-下面简单解释下代码,假设 $A,B,c$的数据已经读到了全局内存中。根据Nvidia GPU的编程模型,有两个关键数据来决定任务的划分,即blockDim和gridDim。这个两个数据类型都Dim3的,也就是三维的。想象一下,有一个 $100*10*10$ 的立方体,这个对应着整个grid。这个立方体被切分成 $10$ 个 $10*10*10$的小立方体.那么gridDim =（10,1,1）,而blockDim =（10,10,10）。并且规定立方体的不可被分割的最小尺寸为 $1*1*1$。这个最小尺寸的立方体就对应着一个CUDA Core。对于矩阵的乘法,应该实际上采用二维来处理,简单的对应就是一个CUDA Core 对应 $C$ 中的一个要计算的值。所以通过上述代码中计算的row 和 col,分别对应要计算的 $C[i][j]$,再对应到相应的 $A$ 的 $i$ 行乘以 $B$ 的 $j$ 列。
+下面简单解释下代码,假设 $A,B,c$的数据已经读到了全局内存中。根据Nvidia GPU的编程模型,有两个关键数据来决定任务的划分,即blockDim和gridDim。这个两个数据类型都Dim3的,也就是三维的。想象一下,有一个 $100*10*10$ 的立方体,这个对应着整个grid。这个立方体被切分成 $10$ 个 $10*10*10$的小立方体.那么gridDim =(10,1,1),而blockDim =(10,10,10)。并且规定立方体的不可被分割的最小尺寸为 $1*1*1$。这个最小尺寸的立方体就对应着一个CUDA Core。对于矩阵的乘法,应该实际上采用二维来处理,简单的对应就是一个CUDA Core 对应 $C$ 中的一个要计算的值。所以通过上述代码中计算的row 和 col,分别对应要计算的 $C[i][j]$,再对应到相应的 $A$ 的 $i$ 行乘以 $B$ 的 $j$ 列。
 
 ### **Nvidia CUDA 共享内存优化矩阵乘法**
 那么上面的代码存在的问题是什么呢,就是每次计算 $C[i][j]$ 的时候,都需要把 $A$ 的 $i$ 行和 $B$ 的 $j$ 列从全局内存中重新读进来一次,实际在矩阵乘法中,并不需要你每次都重新读内存。因为 $A$ 的 $i$ 行都可以用来计算 $C[i]$ 行上的数据。同理可以应用到 $B$ 的分析上去。
@@ -83,7 +83,7 @@ __global__ void matrixKernel(float *dA, float *dB, float *dC, int M, int K, int 
 ```
 代码中已经进一步优化了计算,以防止数组太大的情况下,$A$ 和 $B$ 的数据不能一次性读到共享内存里,所以进行了分块。
 ::: important 
-其中代码 26行和31行处的__syncthreads();其中26行的是为了同步,因为多线程,无法确保计算的顺序,我们使用共享内存是为了提高内存利用率,也就是不止一个线程来使用共享内存,所以应该等待所有的线程都完成了共享内存读取,才能利用共享内存进行计算。第31行的目的,是为了位于内部循环,也就是在每个线程块中的线程已经完成了当前分段（tile）上的部分积计算之后。这个同步点的作用是确保所有线程都完成了当前分段上的乘法累加操作,这样在进行下一个分段的数据加载时,不会出现数据覆盖或使用旧数据的情况。
+其中代码 26行和31行处的__syncthreads();其中26行的是为了同步,因为多线程,无法确保计算的顺序,我们使用共享内存是为了提高内存利用率,也就是不止一个线程来使用共享内存,所以应该等待所有的线程都完成了共享内存读取,才能利用共享内存进行计算。第31行的目的,是为了位于内部循环,也就是在每个线程块中的线程已经完成了当前分段(tile)上的部分积计算之后。这个同步点的作用是确保所有线程都完成了当前分段上的乘法累加操作,这样在进行下一个分段的数据加载时,不会出现数据覆盖或使用旧数据的情况。
 :::
 ::: tip 提示
 因为上面说了共享内存其实也就是被一个block里的线程所共享,所以我们可以把共享内存的大小设为blockDim对应的大小,那么如何实现这一点呢。我们可以使用模板来实现。下面仅给出函数签名
@@ -158,17 +158,17 @@ __global__ void matrixKernel(float *dA, float *dB, float *dC, int M, int K, int 
 ### **Nvidia CUDA 共享内存优化矩阵乘法V3**
 这一步优化,主要针对特定长度的矩阵,优化从全局内存加载到共享内存的过程。假如在上述矩阵中 $M=N=K=1024$。那么我们可以选择 $blockDim=(32,32,1),TM = TN =4,BK=8$; 那么 $SA \in \mathbb{R}^{128*8},SB\in \mathbb{R}^{8*128}$,计算得到 $\mathbb{R}^{128*128}$ 的子矩阵。\
 $0<=tid=threadIdx.x + threadId.y*blockDim.x <=1023$ \
-$\mathrm{smem\_a\_m=tid \% 128 \in\{0,..., 127 \}, smem\_a\_a=tid \ 128 \in\{0,...,8 \}}$ \
-$\mathrm{smem\_b\_k=tid \% 8 \in\{0,..., 8 \}, smem\_a\_a=tid \ 8 \in\{0,...,127 \}}$ \
+$\mathrm{smem\_a\_m=tid \% 2 \in\{0,..., 127 \}, smem\_a\_a=tid / 2 \in\{0,...,8 \}}$ \
+$\mathrm{smem\_b\_k=tid \% 32 \in\{0,..., 8 \}, smem\_a\_a=tid / 32 \in\{0,...,127 \}}$ \
 这种做法的特点是:
-$BM×BK=BN×BK=BLOCK\_DIMx×BLOCK\_DIMy$,需要重新根据一维线程索引排布为二维索引,并且保证SA和SB的大小正好和线程块的线程数目一致。
+$BM*BK=BN*BK=BLOCK\_DIMx*BLOCK\_DIMy$,需要重新根据一维线程索引排布为二维索引,并且保证SA和SB的大小正好和线程块的线程数目一致。
 下面给出代码。
 ```c++
 /*
-const int TM = 8;
-const int TN = 8;
-const int BLOCK_DIM_x = 16;
-const int BLOCK_DIM_y = 16;
+const int TM = 4;
+const int TN = 4;
+const int BLOCK_DIM_x = 32;
+const int BLOCK_DIM_y = 32;
 const int BM = TM * BLOCK_DIM_x;
 const int BN = TN * BLOCK_DIM_y;
 const int BK = 8;
@@ -189,7 +189,7 @@ __global__ void matrixKernel(float *dA, float *dB, float *dC, int M, int K, int 
   int smem_a_m = tid % 2;//分块内部行号
   int smem_a_k = tid / 2;//分块内部列号
   int smem_b_k = tid % 32;//分块内部行号
-  int smem_b_n = tid / 32;//分块内部列好
+  int smem_b_n = tid / 32;//分块内部列号
   for (int ph = 0; ph < width; ph++)
   {
     (float4 &)SA[smem_a_m * BK + 4 * smem_a_k] = (float4 &)dA[(curCol + smem_a_m) * K + 4 * smem_a_k + ph * BK];
@@ -234,7 +234,7 @@ __global__ void matrixKernel(float *dA, float *dB, float *dC, int M, int K, int 
     }
 }
 ```
-下面给出图示
+下面给出图示大致意思
 ::: demo-wrapper img no-padding 
 ![center](/Gemm/fenkuaichongpai.png)
 :::
@@ -243,17 +243,17 @@ __global__ void matrixKernel(float *dA, float *dB, float *dC, int M, int K, int 
   <img src="/Gemm/chongjisuan.png" alt="示例图片">
 </div>
 :::
-与此相关的还有float4优化,也是只能针对特定长度的数组来进行优化。
+实际上上图对SA还做了一次转置来避免bank conflict,在下一节中补充。与此相关的还有float4优化,也是只能针对特定长度的数组来进行优化。
 
 ### **第二重量级的优化,避免bank conflict**
 什么是Bank。Shared Memory 为了提高带宽,划分成了不同的 bank,bank 之间可以并行访问。比较新的 GPU 有 32 个 bank,每个 bank 的宽度是 4 Bytes。Shared Memory 地址和 bank 的关系如下图所示,bank = (Byte-Address / 4) % 32.
 ::: demo-wrapper img no-padding title="bank示意图"
 ![](/Gemm/bankconflict.png)
 :::
-- 什么是 bank conflict？
+- 什么是 bank conflict ?
 同一个 warp 内的多个线程(>=2)访问了同一个 bank 内的不同地址的 4B word (可以理解为 bank 内的不同"行"),这些访存请求将会串行
 - 不同 warp 之间的线程不会发生 bank conflict
-- 如果多个线程访问了同一个4B word（或者同一个 4B word 内的 bytes）,不会发生 bank conflict,而是会 broadcast
+- 如果多个线程访问了同一个4B word(或者同一个 4B word 内的 bytes),不会发生 bank conflict,而是会 broadcast
 - 示例：
   - 下图中,每个线程访问不同的 bank,不会发生 bank conflict
 ::: demo-wrapper img no-padding 
@@ -273,46 +273,51 @@ __global__ void matrixKernel(float *dA, float *dB, float *dC, int M, int K, int 
 ::: demo-wrapper img no-padding 
 ![](/Gemm/8wordsnc.png)
 :::
-讲完了banK的基本知识,那么来进行优化,只要对SA的load进行一个转置就可以了。
-- 如果数据的位置不变的话,Shared Memory 的读和写一定有一个会 bank conflict（个人的分析）
-  - 如果 Shared Memory 按照 Column Major 存储,在 Store 时不会发生 bank conflict,但是 Read 时会发生 bank conflict
-  - 如果 Shared Memory 是 Row Major,在写的时候会 bank conflict,但是读不会。
-  - 这里要补充一下,
-  - 如果 Global Memory 和 Shared Memory 都按照Column Major 存储,则每个线程都应该处理一列上的信息,才会有上面的分析。如果处理一行上的信息,则store 和read时都有bank conflict
-  - 如果都说Row Major 则每个线程都应该处理一行上的信息,才有上面的分析。如果处理一列上的信息,则store 和read时都有bank conflict。
+讲完了banK的基本知识,那么来进行优化,只要对SA的load进行一个转置就可以了。这一点会在下一个章节Cutlas实现Gemm中有详细说明。
+
 
 ### **最具重量级的优化Cutlas源码实现**
-A，B 矩阵一般一次只加载一部分到SMEM（受限于SMEM size），这里在 K 维上有个循环，是 GEMM 的主循环。主循环内加载数据和计算可以 overlap，形成一个 pipeline，用计算掩盖数据访问的耗时。如下图所示：
+A,B 矩阵一般一次只加载一部分到SMEM(限于SMEM size),这里在 K 维上有个循环,是 GEMM 的主循环。主循环内加载数据和计算可以 overlap,形成一个 pipeline,用计算掩盖数据访问的耗时。如下图所示：
 ::: demo-wrapper img no-padding 
 ![](/Gemm/pipline.png)
 :::
-- 大致流程（下面会对着代码详细讲一下）：
-  1. 主循环的一轮开始前，load from Global Memory，调用一次 _syncthreads()，保证 shared memory 是加载好的
-  2. 主循环中，对 warp tile 也在 k 维上有一个循环（内层循环），在内层循环每一轮中 load from Shared Memory 和调用 warp-level mma 是 overlap 的
-- _syncthreads() 是一个 barrier，当同一个 threadblock (不是 warp）中的所有 thread 都达到_syncthreads() 的位置时，才会继续执行
-- - 从 Shared Memory 读取数据到 Register File，再继续进行计算
+- 大致流程：
+  1. 主循环的一轮开始前,load from Global Memory,调用一次 _syncthreads(),保证 shared memory 是加载好的
+  2. 主循环中,对 warp tile 也在 k 维上有一个循环(内层循环),在内层循环每一轮中 load from Shared Memory 和调用 warp-level mma 是 overlap 的
+- _syncthreads() 是一个 barrier,当同一个 threadblock (不是 warp)中的所有 thread 都达到_syncthreads() 的位置时,才会继续执行
+- - 从 Shared Memory 读取数据到 Register File,再继续进行计算
 ::: demo-wrapper img no-padding 
-![](/Gemm/wrap.png)
+![](/Gemm/cutlass.png)
 :::
 #### **Cutlass 如何解决 bank conflicts**
 ::: demo-wrapper img no-padding 
 ![](/Gemm/solvebank1.png)
 :::
-- 上图中，A矩阵从 Global Memory 加载到 Shared Memory，然后调用 ldmatrix 指令加载到 Register File，最后用 Tensor Core 指令计算
-- 每个方块（每个线程）对应 128 bit 数据，所以 warp 中线程分为 4 个 phase 执行访存，Shared Memory 共有 8 个 128 bit 的 bank
-- A矩阵是 Column Major，因此在从 Global Memory 中读取时，每个 phase 读两列，写到 Shared Memory 也是写前两列
+- 上图中,A矩阵从 Global Memory 加载到 Shared Memory,然后调用 ldmatrix 指令加载到 Register File,最后用 Tensor Core 指令计算
+- 每个方块(每个线程)对应 128 bit 数据,所以 warp 中线程分为 4 个 phase 执行访存,Shared Memory 共有 8 个 128 bit 的 bank
+- A矩阵是 Column Major,因此在从 Global Memory 中读取时,每个 phase 读两列,写到 Shared Memory 也是写前两列
 ::: demo-wrapper img no-padding 
 ![](/Gemm/solvebank2.png)
 :::
-- - 如果数据的位置不变的话，Shared Memory 的读和写一定有一个会 bank conflict（个人的分析）
-  - 如果 Shared Memory 按照 Column Major 存储，在 Store 时不会发生 bank conflict，但是 Read 时会发生 bank conflict
-  - 如果 Shared Memory 是 Row Major，在写的时候会 bank conflict，但是读不会
-解决方法
-  - 按照下面的方式重排，Shared Memory 为 Row Major
-    - Store 时，一个 phase 内的线程写入到一行，因为是 Row Major，不会 bank conflict
-    - Load 时，相同颜色的方块，在 tile 中的逻辑位置是一行，ldmatrix 读取时，逻辑上还是读取前两行，但是物理位置上，可以看到在一个warp内，每个颜色的方块在每一列（对应一个bank）都只有一个，所以也是没有 bank conflict 的
- ::: demo-wrapper img no-padding 
+- 上面是英伟达GTC大会PPT上的截图。至于图中的Shared Memory 的读和写一定有一个会 bank conflict。\
+自己想的还不是特别明白.~~我觉得应该特指**Global Memory时Col Major的情况**。因为感觉如果都是Row Major的情况下，Store和Read都不会产生bankconflict，在已经分阶段处理的情况下。这段话还是要结合下面load to register的部分来看。~~
+上面的分析大概率是错的， 这边暂时没搞明白。过几日再更新吧。
+  - ~~如果 Shared Memory 按照 Col Major写入读取。Store时不冲突,Read时冲突。~~
+    <!-- - 看上图中的例子，如果内存布局不变，T0-T7的加载没有bankconflict。但是读取引发了冲突
+    - 改变布局之后，加载和读取都没有引发冲突。 -->
+  - ~~如果 Shared Memory 是 Row Major写入读取,Store的时候不会冲突,Read时不会冲突。~~
+    <!-- - 如果内存布局不变，T0-T7 的加载存在bankconflict。但是读取不会引发了冲突
+    - 改变布局之后，加载和读取都没有引发冲突。 -->
+  - ~~这边其实有点烧脑，有点绕，但我感觉英伟达官方就是这个意思吧，或者能力有限只能理解到这里了。~~
+- 解决方法
+  - 按照下面的方式重排,Shared Memory 为 Row Major
+    - Store 时,一个 phase 内的线程写入到一行,因为是 Row Major,不会 bank conflict
+    - Load 时,相同颜色的方块,在 tile 中的逻辑位置是一行,ldmatrix 读取时,逻辑上还是读取前两行,但是物理位置上,可以看到在一个warp内,每个颜色的方块在每一列(对应一个bank)都只有一个,所以也是没有 bank conflict 的
+::: demo-wrapper img no-padding 
 ![](/Gemm/solvebank3.png)
 :::
-
-## **至此先告一段落，期待后续更新优化 2024.12.2**
+下一步是从share memory 到 register的load过程避免bank conflict
+::: demo-wrapper img no-padding 
+![](/Gemm/toregister.png)
+:::
+## **至此先告一段落,期待后续更新优化 2024.12.2**
