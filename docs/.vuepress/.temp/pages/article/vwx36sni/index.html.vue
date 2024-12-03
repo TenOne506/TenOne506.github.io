@@ -295,7 +295,26 @@
 <p><img src="/Gemm/8wordsnc.png" alt=""></p>
 </div></div><p>讲完了banK的基本知识,那么来进行优化,只要对SA的load进行一个转置就可以了。这一点会在下一个章节Cutlas实现Gemm中有详细说明。</p>
 <h3 id="最具重量级的优化cutlas源码实现" tabindex="-1"><a class="header-anchor" href="#最具重量级的优化cutlas源码实现"><span><strong>最具重量级的优化Cutlas源码实现</strong></span></a></h3>
-<p>A,B 矩阵一般一次只加载一部分到SMEM(限于SMEM size),这里在 K 维上有个循环,是 GEMM 的主循环。主循环内加载数据和计算可以 overlap,形成一个 pipeline,用计算掩盖数据访问的耗时。如下图所示：</p>
+<ul>
+<li>把 GEMM 转化为外积计算，输出的 M x N 分成 tile，各 tile 之间的计算是互不影响的，可以并行。为每一个 tile 分配一个 threadblock 计算</li>
+<li>因为直接访问显存 （Global Memory）latency 很高，并且每个数据都会重复使用。所以把数据先搬运到更高速的存储上，再继续处理</li>
+<li>输入矩阵因为要做频繁的累加计算，放在最快的寄存器（Register File）上
+<ul>
+<li>Register File 是对每个线程私有的</li>
+</ul>
+</li>
+<li>A，B 矩阵的数据因为需要被各线程共享，放到 Shared Memory 上</li>
+</ul>
+<div class="demo-wrapper only-img">
+  <div class="demo-head">
+    <div class="demo-ctrl"><i></i><i></i><i></i></div>
+    
+  </div>
+  <div class="demo-container" >
+<div style="display: flex; justify-content: center; align-items: center;">
+  <img src="/Gemm/threadblock.png" alt="示例图片">
+</div>
+</div></div><p>A,B 矩阵一般一次只加载一部分到SMEM(限于SMEM size),这里在 K 维上有个循环,是 GEMM 的主循环。主循环内加载数据和计算可以 overlap,形成一个 pipeline,用计算掩盖数据访问的耗时。如下图所示：</p>
 <div class="demo-wrapper only-img no-padding">
   <div class="demo-head">
     <div class="demo-ctrl"><i></i><i></i><i></i></div>
@@ -311,11 +330,7 @@
 </ol>
 </li>
 <li>_syncthreads() 是一个 barrier,当同一个 threadblock (不是 warp)中的所有 thread 都达到_syncthreads() 的位置时,才会继续执行</li>
-<li>
-<ul>
 <li>从 Shared Memory 读取数据到 Register File,再继续进行计算</li>
-</ul>
-</li>
 </ul>
 <div class="demo-wrapper only-img no-padding">
   <div class="demo-head">
@@ -324,6 +339,16 @@
   </div>
   <div class="demo-container" >
 <p><img src="/Gemm/cutlass.png" alt=""></p>
+</div></div><ul>
+<li>从 Shared Memory 读取数据到 Register File，再继续进行计算</li>
+</ul>
+<div class="demo-wrapper only-img no-padding">
+  <div class="demo-head">
+    <div class="demo-ctrl"><i></i><i></i><i></i></div>
+    
+  </div>
+  <div class="demo-container" >
+<p><img src="/Gemm/wrap.png" alt=""></p>
 </div></div><h4 id="cutlass-如何解决-bank-conflicts" tabindex="-1"><a class="header-anchor" href="#cutlass-如何解决-bank-conflicts"><span><strong>Cutlass 如何解决 bank conflicts</strong></span></a></h4>
 <div class="demo-wrapper only-img no-padding">
   <div class="demo-head">
@@ -336,6 +361,7 @@
 <li>上图中,A矩阵从 Global Memory 加载到 Shared Memory,然后调用 ldmatrix 指令加载到 Register File,最后用 Tensor Core 指令计算</li>
 <li>每个方块(每个线程)对应 128 bit 数据,所以 warp 中线程分为 4 个 phase 执行访存,Shared Memory 共有 8 个 128 bit 的 bank</li>
 <li>A矩阵是 Column Major,因此在从 Global Memory 中读取时,每个 phase 读两列,写到 Shared Memory 也是写前两列</li>
+<li>线程中 SMEM 指针和目标寄存器的排列如上图右侧所示。</li>
 </ul>
 <div class="demo-wrapper only-img no-padding">
   <div class="demo-head">
@@ -346,18 +372,9 @@
 <p><img src="/Gemm/solvebank2.png" alt=""></p>
 </div></div><ul>
 <li>上面是英伟达GTC大会PPT上的截图。至于图中的Shared Memory 的读和写一定有一个会 bank conflict。<br>
-自己想的还不是特别明白.<s>我觉得应该特指<strong>Global Memory时Col Major的情况</strong>。因为感觉如果都是Row Major的情况下，Store和Read都不会产生bankconflict，在已经分阶段处理的情况下。这段话还是要结合下面load to register的部分来看。</s>
-上面的分析大概率是错的， 这边暂时没搞明白。过几日再更新吧。
-<ul>
-<li><s>如果 Shared Memory 按照 Col Major写入读取。Store时不冲突,Read时冲突。</s><!-- - 看上图中的例子，如果内存布局不变，T0-T7的加载没有bankconflict。但是读取引发了冲突
-- 改变布局之后，加载和读取都没有引发冲突。 -->
-</li>
-<li><s>如果 Shared Memory 是 Row Major写入读取,Store的时候不会冲突,Read时不会冲突。</s><!-- - 如果内存布局不变，T0-T7 的加载存在bankconflict。但是读取不会引发了冲突
-- 改变布局之后，加载和读取都没有引发冲突。 -->
-</li>
-<li><s>这边其实有点烧脑，有点绕，但我感觉英伟达官方就是这个意思吧，或者能力有限只能理解到这里了。</s></li>
-</ul>
-</li>
+自己想的还不是特别明白。</li>
+<li>参考<Icon name="skill-icons:github-dark" size="2em" /><a href="https://github.com/NVIDIA/cutlass/blob/main/media/docs/implicit_gemm_convolution.md" target="_blank" rel="noopener noreferrer">Cutlass链接</a></li>
+<li>大概的意思就是，为了后续从share memory 到 register的load过程避免bank conflict</li>
 <li>解决方法
 <ul>
 <li>按照下面的方式重排,Shared Memory 为 Row Major
@@ -376,7 +393,19 @@
   </div>
   <div class="demo-container" >
 <p><img src="/Gemm/solvebank3.png" alt=""></p>
-</div></div><p>下一步是从share memory 到 register的load过程避免bank conflict</p>
+</div></div><p>在图中，一个 warp 范围的内存访问以蓝色突出显示，单个线程加载一个 128 位向量。全局内存中的 tile 可以对应于 activations 或 filters，并假设是 “strip-mineed” 的，有四个线程加载连续的通道。<br>
+共享内存可视化为“行优先”矩阵，其中八列表示 八个 128 位 SoundBank 的调用。如果每个 WARP 满足以下条件，则对共享内存的访问将是无冲突的：</p>
+<ul>
+<li>{T0， T1， ..， T7} 不访问同一个 128 位bank</li>
+<li>{T8， T9， ..， T15} 不访问同一个 128 位bank</li>
+<li>{T16， T17， ..， T23} 不要访问同一个 128 位bank</li>
+<li>{T24， T25， ..， T31} 不访问同一个 128 位bank <br>
+为了实现无冲突存储，Shared Memory 布局重新映射了 strip-mineed 排列以转置向量，并对每个线程指针的列索引应用 XOR 操作。具体说来</li>
+</ul>
+<div class="language-c++ line-numbers-mode" data-ext="c++" data-title="c++"><button class="copy" title="复制代码" data-copied="已复制"></button><pre class="shiki shiki-themes vitesse-light vitesse-dark vp-code" v-pre=""><code><span class="line"><span style="--shiki-light:#AB5959;--shiki-dark:#CB7676">  int</span><span style="--shiki-light:#393A34;--shiki-dark:#DBD7CAEE"> store_column </span><span style="--shiki-light:#999999;--shiki-dark:#666666">=</span><span style="--shiki-light:#999999;--shiki-dark:#666666"> (</span><span style="--shiki-light:#393A34;--shiki-dark:#DBD7CAEE">lane_id </span><span style="--shiki-light:#AB5959;--shiki-dark:#CB7676">%</span><span style="--shiki-light:#2F798A;--shiki-dark:#4C9A91"> 8</span><span style="--shiki-light:#999999;--shiki-dark:#666666">)</span><span style="--shiki-light:#AB5959;--shiki-dark:#CB7676"> ^</span><span style="--shiki-light:#999999;--shiki-dark:#666666"> (</span><span style="--shiki-light:#393A34;--shiki-dark:#DBD7CAEE">lane_id </span><span style="--shiki-light:#AB5959;--shiki-dark:#CB7676">/</span><span style="--shiki-light:#2F798A;--shiki-dark:#4C9A91"> 8</span><span style="--shiki-light:#999999;--shiki-dark:#666666">);</span></span></code></pre>
+
+<div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0"><div class="line-number"></div></div></div><p>布局上的这种转换将有助于从共享内存读取数据切片，以使用 Tensor Core 计算 warp 级矩阵乘法。</p>
+<p>下一步是从share memory 到 register的load过程避免bank conflict</p>
 <div class="demo-wrapper only-img no-padding">
   <div class="demo-head">
     <div class="demo-ctrl"><i></i><i></i><i></i></div>
@@ -384,7 +413,25 @@
   </div>
   <div class="demo-container" >
 <p><img src="/Gemm/toregister.png" alt=""></p>
-</div></div><h2 id="至此先告一段落-期待后续更新优化-2024-12-2" tabindex="-1"><a class="header-anchor" href="#至此先告一段落-期待后续更新优化-2024-12-2"><span><strong>至此先告一段落,期待后续更新优化 2024.12.2</strong></span></a></h2>
+</div></div><p>上图显示了参与 ldmatrix 指令的前 8 个线程如何在逻辑上映射到共享内存中矩阵的 C=0..31 切片。此切片在代码中称为 “k-group”，因为它对应于 warp 级矩阵乘法的相同 K-index。
+<br>例如，为了加载上图右侧的矩阵，LDMATRIX 会在“线程块平铺的逻辑视图”中加载前 8 个 128b 向量，标记为 T0-T7。这些对应于“从全局/存储加载到共享”图中的 T0、T4、T8、T12、T16、T20、T24、T28。如果没有排列布局，T0、T8、T16、T24 都将位于列/组 0 中，而 T4、T12、T20、T28 都将位于列 4 中。
+<br>要前进到共享内存中的下一个 “k-group”，请按照以下顺序使用 XOR 操作更新指针。</p>
+<ul>
+<li>^1 从 k=0 前进到 k=1</li>
+<li>^3 从 k=1 到 k=2</li>
+<li>^1 从 k=2 前进到 k=3</li>
+<li>^3 从 k=3 前进到 k=0</li>
+</ul>
+<p>这些过渡中的第一个如下所示</p>
+<div class="demo-wrapper only-img">
+  <div class="demo-head">
+    <div class="demo-ctrl"><i></i><i></i><i></i></div>
+    
+  </div>
+  <div class="demo-container" >
+<p><img src="/Gemm/xor1.png" alt="">
+<img src="/Gemm/xor2.png" alt=""></p>
+</div></div><h2 id="至此先告一段落-期待后续更新优化-2024-12-3" tabindex="-1"><a class="header-anchor" href="#至此先告一段落-期待后续更新优化-2024-12-3"><span><strong>至此先告一段落,期待后续更新优化 2024.12.3</strong></span></a></h2>
 </div></template>
 
 
