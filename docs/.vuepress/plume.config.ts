@@ -15,7 +15,7 @@ export default defineThemeConfig({
 
 	profile: {
     
-    avatar: 'plume.svg',
+    avatar: 'avatar.jpg',
     name: 'Wyf',
     description: '天下谁人不识君',
     circle: true,
