@@ -16,7 +16,7 @@ export default defineThemeConfig({
 	profile: {
     
     avatar: 'avatar.jpg',
-    name: 'Wyf',
+    name: 'Peter Park',
     description: '天下谁人不识君',
     circle: true,
     location: '中国',

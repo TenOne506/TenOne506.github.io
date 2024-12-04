@@ -5,9 +5,8 @@ import { codeToTokens } from 'shiki'
 export default defineUserConfig({
 	base: '/',
 	lang: 'zh-CN',
-	title: 'My Blog',
+	title: '救赎之道',
 	description: 'My Blog',
-
 	bundler: viteBundler(),
 
 	theme: plumeTheme({
