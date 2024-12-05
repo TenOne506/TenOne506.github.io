@@ -2,17 +2,18 @@ import { viteBundler } from '@vuepress/bundler-vite'
 import { defineUserConfig } from 'vuepress'
 import { plumeTheme } from 'vuepress-theme-plume'
 import { codeToTokens } from 'shiki'
+import {notes} from './notes'
 export default defineUserConfig({
 	base: '/',
 	lang: 'zh-CN',
 	title: '救赎之道',
 	description: 'My Blog',
 	bundler: viteBundler(),
-
+	
 	theme: plumeTheme({
 		// 添加您的部署域名
 		// hostname: 'https://your_site_url',
-
+	notes,
 	changelog: {
       maxCount: 10,
       repoUrl: 'https://github.com/TenOne506/TenOne506.github.io',
