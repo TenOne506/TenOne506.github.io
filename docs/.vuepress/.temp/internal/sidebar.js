@@ -1,4 +1,4 @@
-export const sidebar = {"/":{"/leetcode/":{"items":["",{"dir":"回溯","text":"回溯","items":"auto","collapsed":false}],"prefix":"/notes/leetcode/"},"/demo":{"items":["","foo","bar"],"prefix":"/notes/demo/"}},"__auto__":{"/notes/leetcode/回溯/":[{"text":"组合","link":"/article/43ijhbod/","items":[]}]},"__home__":{}}
+export const sidebar = {"/":{"/leetcode/":{"items":[{"dir":"回溯","text":"回溯","items":"auto","collapsed":false},{"dir":"数组","text":"数组","items":"auto","collapsed":false}],"prefix":"/notes/leetcode/"},"/interview/":{"items":"auto","prefix":"/notes/interview/"}},"__auto__":{"/notes/leetcode/回溯/":[],"/notes/leetcode/数组/":[],"/notes/interview/":[{"text":"1","link":"/nsxkvzg9/","items":[]}]},"__home__":{}}
 
 if (import.meta.webpackHot) {
   import.meta.webpackHot.accept()

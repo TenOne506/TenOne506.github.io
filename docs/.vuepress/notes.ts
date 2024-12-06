@@ -11,23 +11,36 @@ const demoNote = defineNoteConfig({
 //   notes: [demoNote],
 // })
 const leetcode = defineNoteConfig({
+  link : '/leetcode/',
   dir  : 'leetcode',
-  link : 'leetcode',
+  text : '手撕算法',
   sidebar : [
-    '',
+    
     {
       dir:"回溯",
+      //link :"/leetcode",
       text: "回溯",
+      items:'auto',
+      collapsed: false,
+    },
+    {
+      dir:"数组",
+      //link :"/leetcode",
+      text: "数组",
       items:'auto',
       collapsed: false,
     },
   ]
 })
-
+const interview = defineNoteConfig({
+  link:'/interview/',
+  dir : 'interview',
+  sidebar :'auto'
+})
 export const notes = defineNotesConfig({
   dir: 'notes',
   link: '/',
-  notes: [leetcode,demoNote],
+  notes: [leetcode,interview],
 })
 // export default defineNotesConfig({
 //   dir: '/notes/',

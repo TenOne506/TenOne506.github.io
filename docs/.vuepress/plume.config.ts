@@ -25,7 +25,7 @@ export default defineThemeConfig({
   },
 
   navbar,
-  notes,
+  //notes,
   social: [
     { icon: 'github', link: 'https://github.com/TenOne506/' },
     {icon: 'qq', link: '/'}

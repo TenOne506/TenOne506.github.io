@@ -9,6 +9,6 @@ export const navbar = defineNavbarConfig([
     text: '笔记',
     icon: 'material-symbols:notes' ,
     items: [{ text: '手撕算法题', link: '/notes/leetcode/README.md', },
-            {text:'demo',link:'/notes/demo/README.md',}]
+            {text:'面试',link:'/notes/interview/README.md',}]
   },
 ])
