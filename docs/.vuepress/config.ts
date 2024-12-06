@@ -6,7 +6,7 @@ import {notes} from './notes'
 export default defineUserConfig({
 	base: '/',
 	lang: 'zh-CN',
-	title: '救赎之道',
+	title: '天下谁人不识君',
 	description: 'My Blog',
 	bundler: viteBundler(),
 	
