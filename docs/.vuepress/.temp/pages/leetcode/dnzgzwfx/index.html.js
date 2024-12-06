@@ -1,5 +1,5 @@
 import comp from "D:/Blog/docs/.vuepress/.temp/pages/leetcode/dnzgzwfx/index.html.vue"
-const data = JSON.parse("{\"path\":\"/leetcode/dnzgzwfx/\",\"title\":\"删除数组中重复项\",\"lang\":\"zh-CN\",\"frontmatter\":{\"title\":\"删除数组中重复项\",\"createTime\":\"2024/12/06 14:24:29\",\"permalink\":\"/leetcode/dnzgzwfx/\"},\"headers\":[],\"readingTime\":{\"minutes\":0.41,\"words\":122},\"filePathRelative\":\"notes/leetcode/数组/删除数组中重复项.md\",\"bulletin\":false}")
+const data = JSON.parse("{\"path\":\"/leetcode/dnzgzwfx/\",\"title\":\"删除数组中重复项\",\"lang\":\"zh-CN\",\"frontmatter\":{\"title\":\"删除数组中重复项\",\"createTime\":\"2024/12/06 14:24:29\",\"permalink\":\"/leetcode/dnzgzwfx/\"},\"headers\":[],\"readingTime\":{\"minutes\":2.61,\"words\":783},\"filePathRelative\":\"notes/leetcode/数组/删除数组中重复项.md\",\"bulletin\":false}")
 export { comp, data }
 
 if (import.meta.webpackHot) {
