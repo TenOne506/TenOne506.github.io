@@ -30,6 +30,13 @@ const leetcode = defineNoteConfig({
       items:'auto',
       collapsed: false,
     },
+    {
+      dir:"动态规划",
+      //link :"/leetcode",
+      text: "动态规划",
+      items:'auto',
+      collapsed: false,
+    },
   ]
 })
 const interview = defineNoteConfig({
