@@ -1,5 +1,5 @@
 ---
-title: 记录平时练习和面试所做的力扣算法题
+title: 前言
 createTime: 2024/12/05 20:22:37
 permalink: /leetcode/
 ---

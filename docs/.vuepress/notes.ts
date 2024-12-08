@@ -15,7 +15,7 @@ const leetcode = defineNoteConfig({
   dir  : 'leetcode',
   text : '手撕算法',
   sidebar : [
-    
+    '',
     {
       dir:"回溯",
       //link :"/leetcode",
@@ -42,7 +42,15 @@ const leetcode = defineNoteConfig({
 const interview = defineNoteConfig({
   link:'/interview/',
   dir : 'interview',
-  sidebar :'auto'
+  sidebar :[
+    '',
+    {
+      dir :'',
+      //text : '面试',
+      items:'auto',
+      //collapsed:false
+    }
+  ]
 })
 export const notes = defineNotesConfig({
   dir: 'notes',
