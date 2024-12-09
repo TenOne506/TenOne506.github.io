@@ -37,6 +37,13 @@ const leetcode = defineNoteConfig({
       items:'auto',
       collapsed: false,
     },
+    {
+      dir:"贪心",
+      //link :"/leetcode",
+      text: "贪心",
+      items:'auto',
+      collapsed: false,
+    },
   ]
 })
 const interview = defineNoteConfig({
