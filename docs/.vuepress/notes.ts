@@ -11,8 +11,8 @@ const demoNote = defineNoteConfig({
 //   notes: [demoNote],
 // })
 const leetcode = defineNoteConfig({
-  link : '/leetcode/',
-  dir  : 'leetcode',
+  link : '/code/',
+  dir  : 'code',
   text : '手撕算法',
   sidebar : [
     '',
@@ -44,6 +44,13 @@ const leetcode = defineNoteConfig({
       items:'auto',
       collapsed: false,
     },
+    {
+      dir:"单调队列",
+      //link :"/leetcode",
+      text: "单调队列",
+      items:'auto',
+      collapsed: false,
+    },
   ]
 })
 const interview = defineNoteConfig({
@@ -53,7 +60,8 @@ const interview = defineNoteConfig({
     '',
     {
       dir :'',
-      //text : '面试',
+      //link:'面试',
+      text : '面试',
       items:'auto',
       //collapsed:false
     }
