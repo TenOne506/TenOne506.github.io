@@ -1,7 +1,7 @@
 ---
 title: 前言
 createTime: 2024/12/05 20:22:37
-permalink: /leetcode/
+permalink: /code/
 ---
 
 **建议去力扣或者B站上去看灵茶山艾府(0X3F)的题解或者视频,本人从中受益良多。** \
