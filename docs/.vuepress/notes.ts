@@ -67,10 +67,24 @@ const interview = defineNoteConfig({
     }
   ]
 })
+const compiler = defineNoteConfig({
+  link:'/compiler/',
+  dir : 'compiler',
+  sidebar :[
+    '',
+    {
+      dir :'',
+      //link:'面试',
+      text : 'LLVM',
+      items:'auto',
+      //collapsed:false
+    }
+  ]
+})
 export const notes = defineNotesConfig({
   dir: 'notes',
   link: '/',
-  notes: [leetcode,interview],
+  notes: [leetcode,interview,compiler],
 })
 // export default defineNotesConfig({
 //   dir: '/notes/',
