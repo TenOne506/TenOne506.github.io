@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "interviwew/实习面经.md",
+                "file": "notes/code/动态规划/买股票最佳时期Ⅱ.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "实习面经"
+              "title": "买股票最佳时期Ⅱ"
             }
           }
         ]
@@ -160,10 +160,13 @@
   },
   "active": "34760d4bc93ca1a5",
   "lastOpenFiles": [
+    "notes/code/回溯/组合.md",
+    "notes/code/单调队列/徒步旅行中补给问题.md",
+    "gpu/矩阵乘法从0开始优化到cutlas.md",
+    "preview/markdown.md",
+    "preview/custom-component.example.md",
     "notes/demo/README.md",
     "notes/demo/bar.md",
-    "notes/demo/foo.md",
-    "preview/custom-component.example.md",
-    "preview/markdown.md"
+    "notes/demo/foo.md"
   ]
 }
