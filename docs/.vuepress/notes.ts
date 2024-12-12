@@ -73,11 +73,11 @@ const compiler = defineNoteConfig({
   sidebar :[
     '',
     {
-      dir :'',
+      dir :'LLVM',
       //link:'面试',
       text : 'LLVM',
       items:'auto',
-      //collapsed:false
+      collapsed:false
     }
   ]
 })
