@@ -51,6 +51,20 @@ const leetcode = defineNoteConfig({
       items:'auto',
       collapsed: false,
     },
+    {
+      dir:"哈希",
+      //link :"/leetcode",
+      text: "哈希",
+      items:'auto',
+      collapsed: false,
+    },
+    {
+      dir:"滑动窗口",
+      //link :"/leetcode",
+      text: "滑动窗口",
+      items:'auto',
+      collapsed: false,
+    },
   ]
 })
 const interview = defineNoteConfig({
