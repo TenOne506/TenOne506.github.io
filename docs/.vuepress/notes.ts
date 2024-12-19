@@ -87,6 +87,13 @@ const compiler = defineNoteConfig({
   sidebar :[
     '',
     {
+      dir :'EaC',
+      //link:'面试',
+      text : 'Eac',
+      items:'auto',
+      collapsed:false
+    },
+    {
       dir :'LLVM',
       //link:'面试',
       text : 'LLVM',
