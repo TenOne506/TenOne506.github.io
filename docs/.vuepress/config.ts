@@ -15,7 +15,7 @@ export default defineUserConfig({
 		// hostname: 'https://your_site_url',
 	notes,
 	changelog: {
-      maxCount: 10,
+      maxCount: 1,
       repoUrl: 'https://github.com/TenOne506/TenOne506.github.io',
       commitUrlPattern: ':repo/commit/:hash',
       issueUrlPattern: ':repo/issues/:issue',
