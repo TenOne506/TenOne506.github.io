@@ -9,7 +9,11 @@ export default defineUserConfig({
 	title: '我的大学',
 	description: 'My Blog',
 	bundler: viteBundler(),
-	
+	head : [
+		['link', { rel: 'icon', href: '/icons/spider-man.svg' }],
+		['meta', { name: 'author', content: 'TenOne506' }],
+		['meta', { name: 'keywords', content: 'My Blog And Notes' }],
+	],
 	theme: plumeTheme({
 		// 添加您的部署域名
 		// hostname: 'https://your_site_url',
