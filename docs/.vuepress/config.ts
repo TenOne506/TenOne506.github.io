@@ -8,6 +8,7 @@ export default defineUserConfig({
 	lang: 'zh-CN',
 	title: '我的大学',
 	description: 'My Blog',
+	shouldPrefetch:false,
 	bundler: viteBundler(),
 	head : [
 		['link', { rel: 'icon', href: '/icons/spider-man.svg' }],
