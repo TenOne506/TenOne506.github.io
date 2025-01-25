@@ -91,15 +91,16 @@ const compiler = defineNoteConfig({
       //link:'面试',
       text : 'Eac',
       items:'auto',
-      collapsed:false
+      collapsed:true
     },
     {
       dir :'LLVM',
       //link:'面试',
       text : 'LLVM',
       items:'auto',
-      collapsed:false
+      collapsed:true
     }
+    
   ]
 })
 export const notes = defineNotesConfig({
