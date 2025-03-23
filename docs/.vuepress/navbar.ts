@@ -6,6 +6,7 @@ export const navbar = defineNavbarConfig([
   { text: '编译原理', link: '/notes/compiler/README.md',icon:"/icons/compilerexplorer.svg"},
   //'flat-color-icons:electronics'
   { text: '手撕算法题', link: '/notes/code/README.md',icon: '/icons/code.svg'},
+  //{ text: '八股', link:'/notes/detail/README.md',icon: '/icons/interview.svg'},
   { text: '面试', link:'/notes/interview/README.md',icon: '/icons/interview.svg'},
   //{ text: '标签', link: '/blog/tags/' ,icon: 'material-symbols:label'},
   //{ text: '归档', link: '/blog/archives/' ,icon: 'flat-color-icons:library'},

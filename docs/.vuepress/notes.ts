@@ -81,6 +81,21 @@ const interview = defineNoteConfig({
     }
   ]
 })
+
+const detail = defineNoteConfig({
+  link:'/detail/',
+  dir : 'detail',
+  sidebar :[
+    '',
+    {
+      dir :'',
+      //link:'面试',
+      text : '八股',
+      items:'auto',
+      //collapsed:false
+    }
+  ]
+})
 const compiler = defineNoteConfig({
   link:'/compiler/',
   dir : 'compiler',
