@@ -1,31 +1,37 @@
 {
-  "name": "my-vuepress-site",
+  "name": "my-test",
   "type": "module",
   "version": "1.0.0",
-  "description": "My Blog",
-  "author": "yzwyf <w13852770506@163.com>",
+  "description": "",
+  "packageManager": "pnpm@10.10.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild"
+    ]
+  },
+  "author": "TenThousandOne <w13852770506@163.com>",
   "license": "MIT",
   "engines": {
-    "node": "^18.20.0 || >=20.0.0"
+    "node": "^20.6.0 || >=22.0.0"
   },
   "scripts": {
     "docs:dev": "vuepress dev docs",
     "docs:dev-clean": "vuepress dev docs --clean-cache --clean-temp",
     "docs:build": "vuepress build docs --clean-cache --clean-temp",
     "docs:preview": "http-server docs/.vuepress/dist",
-    "vp-update": "npx vp-update"
+    "vp-update": "pnpm dlx vp-update"
   },
   "devDependencies": {
-    "@vuepress/bundler-vite": "2.0.0-rc.19",
+    "@vuepress/bundler-vite": "2.0.0-rc.22",
     "http-server": "^14.1.1",
-    "sass-embedded": "^1.80.6",
-    "typescript": "^5.6.3",
+    "sass-embedded": "^1.87.0",
+    "typescript": "^5.8.3",
     "vue": "^3.5.13",
-    "vuepress": "2.0.0-rc.19",
-    "vuepress-theme-plume": "1.0.0-rc.129"
+    "vuepress": "2.0.0-rc.22",
+    "vuepress-theme-plume": "1.0.0-rc.145"
   },
   "dependencies": {
-    "@iconify/json": "^2.2.279",
-    "esbuild": "^0.24.0"
+    "shiki": "^3.3.0"
   }
 }

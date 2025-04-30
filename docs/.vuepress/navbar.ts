@@ -3,6 +3,8 @@ import { defineNavbarConfig } from 'vuepress-theme-plume'
 export const navbar = defineNavbarConfig([
   { text: '首页', link: '/' ,icon: 'flat-color-icons:home'},
   { text: '博客', link: '/blog/' ,icon: '/icons/blog.svg'},
+
+  { text: '搜索引擎', link: '/notes/searchengine/README.md',icon: '/icons/search.svg'},
   { text: '编译原理', link: '/notes/compiler/README.md',icon:"/icons/compilerexplorer.svg"},
   //'flat-color-icons:electronics'
   { text: '手撕算法题', link: '/notes/code/README.md',icon: '/icons/code.svg'},

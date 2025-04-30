@@ -1,7 +1,7 @@
 ---
 title: 前言
 createTime: 2024/12/06 17:20:11
-permalink: /interview/u4pv3qyp/
+permalink: /interview/
 ---
 # 记录在实习和秋招中面试提到的问题
 
@@ -21,4 +21,4 @@ permalink: /interview/u4pv3qyp/
 
 ## 暑期
 
-正式拿下腾讯机器学习平台部的offer，混元大模型相关的业务。
+正式拿下腾讯机器学习平台部的offer，混元大模型相关的业务。具体应该是搜索引擎相关。

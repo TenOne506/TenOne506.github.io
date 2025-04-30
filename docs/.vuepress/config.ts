@@ -1,7 +1,7 @@
 import { viteBundler } from '@vuepress/bundler-vite'
 import { defineUserConfig } from 'vuepress'
 import { plumeTheme } from 'vuepress-theme-plume'
-import { codeToTokens } from 'shiki'
+//import { codeToTokens } from 'shiki'
 import {notes} from './notes'
 export default defineUserConfig({
 	base: '/',
@@ -26,68 +26,79 @@ export default defineUserConfig({
       issueUrlPattern: ':repo/issues/:issue',
       tagUrlPattern: ':repo/releases/tag/:tag'
     },
-		plugins: {
-			git: process.env.NODE_ENV === 'production',
-			/**
-			 * Shiki 代码高亮
-			 * @see https://theme-plume.vuejs.press/config/plugins/code-highlight/
-			 */
-			shiki: {
-				theme: { light: 'everforest-light', dark: 'houston' },
-				//强烈建议预设代码块高亮语言，插件默认加载所有语言会产生不必要的时间开销
-				languages: ['shell', 'bash', 'c++', 'c','python'],
-				lineNumbers: true
-			},
-
-			/**
-			 * markdown enhance
-			 * @see https://theme-plume.vuejs.press/config/plugins/markdown-enhance/
-			 */
-			markdownEnhance: {
-				demo: true,
-			//   include: true,
-			//   chart: true,
-			//   echarts: true,
-			//   mermaid: true,
-			//   flowchart: true,
-			},
-
-			/**
-			 *  markdown power
-			 * @see https://theme-plume.vuejs.press/config/plugin/markdown-power/
-			 */
-			// markdownPower: {
-			//   pdf: true,
-			//   caniuse: true,
-			//   plot: true,
-			//   bilibili: true,
-			//   youtube: true,
-			//   icons: true,
-			//   codepen: true,
-			//   replit: true,
-			//   codeSandbox: true,
-			//   jsfiddle: true,
-			//   repl: {
-			//     go: true,
-			//     rust: true,
-			//     kotlin: true,
-			//   },
-			// },
-
-			/**
-			 * 评论 comments
-			 * @see https://theme-plume.vuejs.press/guide/features/comments/
-			 */
-			// comment: {
-			//   provider: '', // "Artalk" | "Giscus" | "Twikoo" | "Waline"
-			//   comment: true,
-			//   repo: '',
-			//   repoId: '',
-			//   categoryId: '',
-			//   mapping: 'pathname',
-			//   reactionsEnabled: true,
-			//   inputPosition: 'top',
-			// },
+	codeHighlighter: {
+		themes: {
+			light: 'everforest-light',
+			dark: 'houston',
 		},
+		//theme:{ light: 'github-light', dark: 'github-dark' },
+		//theme: { light: 'github-light', dark: 'houston' },
+		notationDiff: true,
+		notationErrorLevel: true,
+		notationFocus: true,
+		notationHighlight: true,
+		notationWordHighlight: true,
+		highlightLines: true,
+		collapsedLines: false,
+		lineNumbers: true,
+	},	
+	//readingTime: true,
+		// plugins: {
+		// 	git: process.env.NODE_ENV === 'production',
+		// 	/**
+		// 	 * Shiki 代码高亮
+		// 	 * @see https://theme-plume.vuejs.press/config/plugins/code-highlight/
+		// 	 */
+
+		// 	/**
+		// 	 * markdown enhance
+		// 	 * @see https://theme-plume.vuejs.press/config/plugins/markdown-enhance/
+		// 	 */
+		// 	markdownEnhance: {
+		// 		demo: true,
+		// 	//   include: true,
+		// 	//   chart: true,
+		// 	//   echarts: true,
+		// 	//   mermaid: true,
+		// 	//   flowchart: true,
+		// 	},
+
+		// 	/**
+		// 	 *  markdown power
+		// 	 * @see https://theme-plume.vuejs.press/config/plugin/markdown-power/
+		// 	 */
+		// 	// markdownPower: {
+		// 	//   pdf: true,
+		// 	//   caniuse: true,
+		// 	//   plot: true,
+		// 	//   bilibili: true,
+		// 	//   youtube: true,
+		// 	//   icons: true,
+		// 	//   codepen: true,
+		// 	//   replit: true,
+		// 	//   codeSandbox: true,
+		// 	//   jsfiddle: true,
+		// 	//   repl: {
+		// 	//     go: true,
+		// 	//     rust: true,
+		// 	//     kotlin: true,
+		// 	//   },
+		// 	// },
+
+		// 	/**
+		// 	 * 评论 comments
+		// 	 * @see https://theme-plume.vuejs.press/guide/features/comments/
+		// 	 */
+		// 	// comment: {
+		// 	//   provider: '', // "Artalk" | "Giscus" | "Twikoo" | "Waline"
+		// 	//   comment: true,
+		// 	//   repo: '',
+		// 	//   repoId: '',
+		// 	//   categoryId: '',
+		// 	//   mapping: 'pathname',
+		// 	//   reactionsEnabled: true,
+		// 	//   inputPosition: 'top',
+		// 	// },
+		// },
 	}),
 })

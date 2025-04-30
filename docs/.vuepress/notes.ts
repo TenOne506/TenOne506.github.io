@@ -118,10 +118,25 @@ const compiler = defineNoteConfig({
     
   ]
 })
+
+const searchengine = defineNoteConfig({
+  link: '/searchengine/',
+  dir: 'searchengine',
+  sidebar: [
+    '',  // README.md
+    { 
+      dir :'',
+      text: '搜索',
+      items: 'auto',  // 自动生成当前目录下的条目
+      collapsed: true
+    }
+  ]
+})
+
 export const notes = defineNotesConfig({
   dir: 'notes',
   link: '/',
-  notes: [leetcode,interview,compiler],
+  notes: [leetcode,interview,compiler,searchengine],
 })
 // export default defineNotesConfig({
 //   dir: '/notes/',

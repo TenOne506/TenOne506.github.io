@@ -1,24 +1,24 @@
-# my-vuepress-site
+# 我的记录
 
 网站使用 [vuepress](https://vuepress.vuejs.org/) 和 [vuepress-theme-plume](https://github.com/pengzhanbo/vuepress-theme-plume) 构建生成。
 
 ## Install
 
 ```sh
-npm i
+pnpm i
 ```
 
 ## Usage
 
 ```sh
 # 启动开发服务
-npm run docs:dev
+pnpm docs:dev
 # 构建生产包
-npm run docs:build
+pnpm docs:build
 # 本地预览生产服务
-npm run docs:preview
+pnpm docs:preview
 # 更新 vuepress 和主题
-npm run vp-update
+pnpm vp-update
 ```
 
 ## 文档
