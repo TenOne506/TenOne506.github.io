@@ -42,6 +42,17 @@ export default defineUserConfig({
 		collapsedLines: false,
 		lineNumbers: true,
 	},	
+	markdown: {
+		hint: true,
+		alert: true,
+		fileTree: true,
+		plot: true,
+		icons: true,
+		math: { type: 'katex' },
+		include: {
+		  // ...option
+		}
+	},
 	//readingTime: true,
 		// plugins: {
 		// 	git: process.env.NODE_ENV === 'production',
