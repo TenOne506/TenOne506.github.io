@@ -52,12 +52,12 @@ export default defineThemeConfig({
    */
   profile: {
     
-    avatar: 'avatar.jpg',
-    name: 'Yiven',
+    avatar: 'avatar.png',
+    name: 'Zephyrus',
     description: '天下谁人不识君',
     circle: true,
     location: '中国',
-    organization: 'Tencent',
+    organization: 'HIT',
     layout: 'right',
   },
 

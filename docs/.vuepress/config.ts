@@ -4,7 +4,8 @@
  * - @see https://theme-plume.vuejs.press/config/theme/ 主题配置项
  *
  * 请注意，对此文件的修改都会重启 vuepress 服务。
- * 部分配置项的更新没有必要重启 vuepress 服务，建议请在 `.vuepress/config.ts` 文件中配置
+ * 部分配置项的更新没有必要重启 vuepress 服务，建议请在 `.vuepress/config.ts`
+ * 文件中配置
  *
  * 特别的，请不要在两个配置文件中重复配置相同的项，当前文件的配置项会被覆盖
  */
@@ -16,14 +17,14 @@ import { plumeTheme } from 'vuepress-theme-plume'
 export default defineUserConfig({
   base: '/',
   lang: 'zh-CN',
-  title: 'Yiven | Building Things That Matter',
-  description: 'Yiven',
+  title: 'Zephyrus\'s Whisper',
+  description: 'Zephyrus',
   
   head: [
     // 设置 favicon（支持 SVG / PNG / ICO）
     // 或者用 PNG 图标（兼容性更好）
     //['title', {}, 'Yiven | Building Things That Matter'],
-    //['link', { rel: 'icon', type: 'image/svg',href: '/favicon.svg', sizes: '16*16' }],
+    ['link', { rel: 'icon', type: 'image/svg',href: '/icons/spider-man.svg', sizes: '16*16' }],
     // ['meta', { name: 'title', content: 'Yiven | Building Things That Matter' }],
     // ['meta', { name: 'description', content: '我的技术博客' }],
     // ['meta', { name: 'keywords', content: 'VuePress, 博客, 前端' }]

@@ -8,7 +8,7 @@
       <!-- <a href="https://gitee.com/TenOne506" target="_blank" class="head-social-btn">
         <icon name="simple-icons:gitee" />
       </a> -->
-      <router-link to="/blog/" class="head-social-avatar"><img src="/avatar.jpg" alt="avatar"></router-link>
+      <router-link to="/blog/" class="head-social-avatar"><img src="/avatar.png" alt="avatar"></router-link>
       <!-- <a href="https://codepen.io/zhenghaoyang24" target="_blank" class="head-social-btn">
         <icon class="head-social-btn" name="simple-icons:codepen"></icon>
       </a> -->
@@ -105,7 +105,7 @@
 .about-me-card-text-big{
   color: var(--vp-c-text-1);
   margin: 10px 0;
-  font-size: 36px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1.1;
   @media screen and (max-width: 770px) {
@@ -157,19 +157,29 @@ canvas {
 
   .head-social-avatar {
     margin: 20px;
-    border-radius: 30%;
+    /* 修改为50%以实现圆形 */
+    border-radius: 50%;
     overflow: hidden;
     width: 60px;
+    height: 60px; /* 确保高度与宽度相等，以保持正方形比例 */
     transition: all 0.2s;
     box-shadow: 0 4px 6px var(--avatartar-shadow-color, rgba(0, 0, 0, 0.1));
 
     /* 更柔和的阴影 */
     &:hover {
-      transform: translateY(-2px);
-      /* 轻微上浮效果替代缩放 */
-      box-shadow: 0 6px 12px var(--avatartar-shadow-color, rgba(0, 0, 0, 0.2));
-      /* 悬停时阴影扩散 */
+        transform: translateY(-2px);
+        /* 轻微上浮效果替代缩放 */
+        box-shadow: 0 6px 12px var(--avatartar-shadow-color, rgba(0, 0, 0, 0.2));
+        /* 悬停时阴影扩散 */
     }
+}
+
+/* 确保 img 元素完全填充其父容器并维持圆形 */
+.head-social-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 保证图片内容被裁剪或填充以适应容器 */
+    border-radius: inherit; /* 继承父级的圆角设置 */
   }
 
   .head-social-btn {
