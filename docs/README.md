@@ -4,7 +4,8 @@ externalLinkIcon: False
 config:
   -
     #type: hero
-    type: GridHome
+    #type: GridHome
+    type: Zephyrus
     full: true
     effect: lightning
     # hero:

@@ -8,9 +8,12 @@ import { defineClientConfig } from 'vuepress/client'
 
 // import './theme/styles/custom.css'
 import GridHome from './theme/components/gridhome/GridHome.vue'
+import Zephyrus from './theme/components/Zephyrus/Zephyrus.vue'
+import './theme/styles/index.css'
 export default defineClientConfig({
   enhance({ app }) {
-    app.component('GridHome', GridHome)
+        app.component('GridHome', GridHome)
+        app.component('Zephyrus', Zephyrus)
     // built-in components
     // app.component('RepoCard', RepoCard)
     // app.component('NpmBadge', NpmBadge)
