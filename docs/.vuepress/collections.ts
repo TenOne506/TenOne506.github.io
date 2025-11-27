@@ -148,17 +148,11 @@ const interviewDoc = defineCollection({
 })
 
 const compilerDoc = defineCollection({
-  // doc 类型，该类型带有侧边栏
   type: 'doc',
-  // 文档集合所在目录，相对于 `docs`
   dir: 'compiler',
-  // `dir` 所指向的目录中的所有 markdown 文件，其 permalink 需要以 `linkPrefix` 配置作为前缀
-  // 如果 前缀不一致，则无法生成侧边栏。
-  // 所以请确保  markdown 文件的 permalink 都以 `linkPrefix` 开头
   linkPrefix: '/compiler',
-  // 文档标题，它将用于在页面的面包屑导航中显示
   title: '编译原理',
-  // 手动配置侧边栏结构
+
   sidebar : [
     '', {
       dir : 'EaC',
@@ -175,25 +169,14 @@ const compilerDoc = defineCollection({
       collapsed : true
     }
   ],
-  //sidebar: ['', 'foo', 'bar'],
-  // 根据文件结构自动生成侧边栏
-  // sidebar: 'auto',
+
 })
 
 const searchengineDoc = defineCollection({
-  // doc 类型，该类型带有侧边栏
   type: 'doc',
-  // 文档集合所在目录，相对于 `docs`
   dir: 'searchengine',
-  // `dir` 所指向的目录中的所有 markdown 文件，其 permalink 需要以 `linkPrefix` 配置作为前缀
-  // 如果 前缀不一致，则无法生成侧边栏。
-  // 所以请确保  markdown 文件的 permalink 都以 `linkPrefix` 开头
   linkPrefix: '/searchengine',
-  // 文档标题，它将用于在页面的面包屑导航中显示
   title: '搜索引擎',
-  // 手动配置侧边栏结构
-  //sidebar: ['', 'foo', 'bar'],
-  // 根据文件结构自动生成侧边栏
   sidebar : [
     '', // README.md
     {
@@ -211,6 +194,20 @@ const searchengineDoc = defineCollection({
   ]
 })
 
+const distsysDoc = defineCollection({
+  type: 'doc',
+  dir: 'distsys',
+  linkPrefix: '/distsys',
+  title: '分布式系统',
+  sidebar: ['',
+    {
+    dir : 'paper',
+    text : '论文',
+    items : 'auto', // 自动生成当前目录下的条目
+    collapsed : false
+  }]
+})
+
 /**
  * 导出所有的 collections
  * (blog 为博客示例，如果不需要博客功能，请删除)
@@ -221,5 +218,6 @@ export default defineCollections([
   codeDoc,
   interviewDoc,
   compilerDoc,
-  searchengineDoc
+  searchengineDoc,
+  distsysDoc,
 ])
