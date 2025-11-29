@@ -87,9 +87,9 @@ export default defineUserConfig({
      */
     codeHighlighter: {
       themes: {
-        light: 'everforest-light',
+        light: 'min-light',
         dark: 'houston',
-      },
+        },
       //theme:{ light: 'github-light', dark: 'github-dark' },
       //theme: { light: 'github-light', dark: 'houston' },
       notationDiff: true,
