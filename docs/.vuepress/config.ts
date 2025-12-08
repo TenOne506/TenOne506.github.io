@@ -46,9 +46,9 @@ export default defineUserConfig({
 
     /* 页内信息 */
     // editLink: true,
-    // lastUpdated: true,
-    // contributors: true,
-    // changelog: false,
+    lastUpdated: false,
+    contributors: false,
+    changelog: false,
 
     /**
      * 编译缓存，加快编译速度

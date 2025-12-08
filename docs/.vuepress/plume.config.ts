@@ -39,7 +39,7 @@ export default defineThemeConfig({
 
     // prevPage: true,   // 是否启用上一页链接
     // nextPage: true,   // 是否启用下一页链接
-    // createTime: true, // 是否显示文章创建时间
+    createTime: true, // 是否显示文章创建时间
 
     /* 站点页脚 */
     // footer: {

@@ -9,7 +9,7 @@
             <img src="/avatar.png" alt="TenOne506 Avatar" class="profile-avatar">
           </router-link>
           
-          <h1 class="main-title">TenOne506</h1>
+          <!-- <h1 class="main-title"></h1> -->
           <p class="subtitle">
             <span class="zephyrus-text">Zephyrus</span>'s Flow: A Data Journey Through Code & Life
           </p>
@@ -30,8 +30,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-
 // --- Particle Flow System (鼠标互动增强版 V4 - 速度调整) ---
+// Particle interface and constants remain the same
 interface Particle {
   x: number; y: number; size: number; baseSpeedX: number; baseSpeedY: number;
   currentSpeedX: number; currentSpeedY: number; color: string; noiseOffset: number; 
@@ -41,15 +41,79 @@ interface Particle {
 const windCanvasRef = ref<HTMLCanvasElement | null>(null);
 const ctx = ref<CanvasRenderingContext2D | null>(null);
 let particles: Particle[] = [];
-const numberOfParticles = 120;
-const maxParticleSize = 2; 
-const minParticleSize = 0.8;
+const numberOfParticles = 48;
+const maxParticleSize = 2.5; 
+const minParticleSize = 1.0;
 const mouse = {
   x: -1, y: -1, radius: 180, attractionFactor: 0.15, influenceSpeed: 4, 
 };
 let animationFrameId: number;
 const time = ref(0); 
 const trailLength = 10;
+const noiseScale = 0.003; // 💥 新增: 噪声场的缩放因子，控制风的粗细
+const noiseStrength = 0.9; // 💥 新增: 噪声对粒子速度的影响强度
+
+// --- 💥 核心改动：柏林噪声（Perlin Noise）实现 ---
+
+// Permutation table (256 entries) for Perlin Noise
+const p = new Array(512);
+const permutation = new Array(256).fill(0).map((_, i) => i);
+// Shuffle the permutation array (simplified but functional shuffle)
+for (let i = permutation.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [permutation[i], permutation[j]] = [permutation[j], permutation[i]];
+}
+for (let i = 0; i < 256; i++) {
+    p[i] = p[i + 256] = permutation[i];
+}
+
+// 辅助函数：插值
+function fade(t: number) {
+    return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+// 辅助函数：线性插值
+function lerp(a: number, b: number, t: number) {
+    return (1 - t) * a + t * b;
+}
+
+// 辅助函数：梯度计算
+function grad(hash: number, x: number, y: number): number {
+    const h = hash & 15;
+    const u = h < 8 ? x : y;
+    const v = h < 4 ? y : (h === 12 || h === 14 ? x : 0);
+    return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+}
+
+// 2D 柏林噪声函数
+function perlin2D(x: number, y: number): number {
+    const X = Math.floor(x) & 255;
+    const Y = Math.floor(y) & 255;
+
+    x -= Math.floor(x);
+    y -= Math.floor(y);
+
+    const u = fade(x);
+    const v = fade(y);
+
+    const A = p[X] + Y;
+    const B = p[X + 1] + Y;
+
+    const A0 = p[A];
+    const A1 = p[A + 1];
+    const B0 = p[B];
+    const B1 = p[B + 1];
+
+    // 梯度点乘
+    return lerp(
+        lerp(grad(A0, x, y), grad(B0, x - 1, y), u),
+        lerp(grad(A1, x, y - 1), grad(B1, x - 1, y - 1), u),
+        v
+    );
+}
+
+// --- End Perlin Noise ---
+
 
 const initCanvas = () => {
   const canvas = windCanvasRef.value;
@@ -81,9 +145,10 @@ const createParticle = (): Particle => {
     ? 'rgba(100, 190, 190, 0.7)'
     : 'rgba(80, 134, 161, 0.7)';
 
-  // 💥 速度优化：增大基础速度范围，使粒子移动更快
-  const baseSpeedX = (Math.random() * 0.8) + 0.6; 
-  const baseSpeedY = (Math.random() * 0.8) - 0.4;
+  // 基础速度：保持正向（向右）
+// 优化后的基础速度范围：[0.8, 1.2]，差异更小，整体更均匀
+const baseSpeedX = (Math.random() * 0.4) + 0.8; 
+const baseSpeedY = (Math.random() * 0.2) - 0.1; // 进一步减小Y轴波动
 
   return {
     x: Math.random() * canvas.width,
@@ -127,9 +192,14 @@ const updateParticle = (particle: Particle) => {
     particle.history.shift();
   }
 
-  // 基础速度 + 柏林噪声（Perlin Noise）或类似函数实现轻微的随机波动
-  particle.currentSpeedX = particle.baseSpeedX + Math.sin(time.value * 0.08 + particle.noiseOffset) * 0.08;
-  particle.currentSpeedY = particle.baseSpeedY + Math.cos(time.value * 0.08 + particle.noiseOffset * 0.6) * 0.08;
+  // 💥 核心改动：使用 Perlin Noise 计算风力波动
+  const noiseX = perlin2D(particle.x * noiseScale, particle.y * noiseScale);
+  const noiseY = perlin2D(particle.y * noiseScale + 1000, particle.x * noiseScale + 1000); 
+  // 不同的坐标偏移可以产生不同的噪声值
+
+  // 基础风速 + 噪声波动
+  particle.currentSpeedX = particle.baseSpeedX + noiseX * noiseStrength;
+  particle.currentSpeedY = particle.baseSpeedY + noiseY * noiseStrength;
 
   const dx = mouse.x - particle.x;
   const dy = mouse.y - particle.y;
@@ -148,7 +218,7 @@ const updateParticle = (particle: Particle) => {
     particle.currentSpeedX += influenceX;
     particle.currentSpeedY += influenceY;
 
-    // 限制最大速度 (基于新 baseSpeedX 的 4 倍)
+    // 限制最大速度 (基于 baseSpeedX 的 4 倍)
     const maxSpeed = particle.baseSpeedX * 4; 
     particle.currentSpeedX = Math.max(-maxSpeed, Math.min(maxSpeed, particle.currentSpeedX));
     particle.currentSpeedY = Math.max(-maxSpeed, Math.min(maxSpeed, particle.currentSpeedY));
@@ -164,9 +234,9 @@ const updateParticle = (particle: Particle) => {
     particle.y = Math.random() * canvas.height; 
     particle.size = Math.random() * (maxParticleSize - minParticleSize) + minParticleSize;
     
-    // 重新生成粒子速度 (使用新的速度范围)
+    // 重新生成粒子速度
     particle.baseSpeedX = (Math.random() * 0.8) + 0.6;
-    particle.baseSpeedY = (Math.random() * 0.8) - 0.4;
+    particle.baseSpeedY = (Math.random() * 0.4) - 0.2;
     
     particle.history = []; 
   }
@@ -181,12 +251,12 @@ const animate = () => {
   const context = ctx.value;
   if (!canvas || !context) return;
 
-  // 💥 速度优化：略微加快时间步长，提高波动频率
+  // 时间步长
   time.value += 0.15; 
 
   context.fillStyle = document.documentElement.getAttribute('data-theme') === 'dark'
-    ? 'rgba(40, 58, 40, 0.1)'
-    : 'rgba(233, 245, 233, 0.1)'; 
+    ? 'rgba(40, 58, 40, 0.08)'
+    : 'rgba(233, 245, 233, 0.08)'; 
   context.fillRect(0, 0, canvas.width, canvas.height);
 
   for (let i = 0; i < particles.length; i++) {
@@ -216,6 +286,29 @@ const handleThemeChange = () => {
 };
 
 onMounted(() => {
+  // 💥 检查点：确保 initCanvas 和 animate 在组件加载后运行
+  initCanvas();
+  animate();
+  
+  // 监听主题变化
+  new MutationObserver(handleThemeChange).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+  });
+});
+
+onUnmounted(() => {
+  // 💥 检查点：确保清理工作在组件卸载时运行
+  window.removeEventListener('resize', resizeCanvas);
+  window.removeEventListener('mousemove', handleMouseMove);
+  window.removeEventListener('mouseleave', handleMouseLeave);
+  cancelAnimationFrame(animationFrameId);
+});
+
+// Assuming this code is inside a Vue setup script or similar environment
+// with onMounted and onUnmounted defined.
+/*
+onMounted(() => {
   initCanvas();
   animate();
   
@@ -231,6 +324,7 @@ onUnmounted(() => {
   window.removeEventListener('mouseleave', handleMouseLeave);
   cancelAnimationFrame(animationFrameId);
 });
+*/
 </script>
 
 <style scoped>
