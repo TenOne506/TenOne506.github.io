@@ -204,8 +204,15 @@ const distsysDoc = defineCollection({
     dir : 'paper',
     text : '论文',
     items : 'auto', // 自动生成当前目录下的条目
-    collapsed : false
-  }]
+    collapsed : true
+    },
+    {
+        dir: "theory", 
+        text: "分布式基础理论",
+        items: 'auto', // 自动生成当前目录下的条目
+        collapsed: true,
+    },
+  ]
 })
 
 /**
