@@ -196,8 +196,14 @@ const searchengineDoc = defineCollection({
   sidebar : [
     '', // README.md
     {
-      dir : 'theory',
-      text : 'NLP和LLM理论',
+      dir : 'nlptheory',
+      text : 'NLP理论',
+      items : 'auto', // 自动生成当前目录下的条目
+      collapsed : false
+      },
+    {
+      dir : 'setheory',
+      text : '搜索引擎理论',
       items : 'auto', // 自动生成当前目录下的条目
       collapsed : false
     },
