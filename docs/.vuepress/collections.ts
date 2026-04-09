@@ -242,7 +242,15 @@ const genmodelDoc = defineCollection({
   dir: 'genmodel',
   linkPrefix: '/genmodel',
   title: '生成模型',
-  sidebar: 'auto'
+  sidebar: [
+    '',
+    {
+      dir: '',
+      //   text: '生成模型',
+      items: 'auto',  // 自动生成当前目录下的条目
+      collapsed: true,
+    },
+  ]
 })
 /**
  * 导出所有的 collections
