@@ -237,17 +237,19 @@ const distsysDoc = defineCollection({
   ]
 })
 
+const genmodelDoc = defineCollection({
+  type: 'doc',
+  dir: 'genmodel',
+  linkPrefix: '/genmodel',
+  title: '生成模型',
+  sidebar: 'auto'
+})
 /**
  * 导出所有的 collections
  * (blog 为博客示例，如果不需要博客功能，请删除)
  * (demoDoc 为参考示例，如果不需要它，请删除)
  */
 export default defineCollections([
-  blog,
-  tips,
-  codeDoc,
-  interviewDoc,
-  compilerDoc,
-  searchengineDoc,
-  distsysDoc,
+  blog, tips, codeDoc, interviewDoc, compilerDoc, searchengineDoc, distsysDoc,
+  genmodelDoc
 ])
