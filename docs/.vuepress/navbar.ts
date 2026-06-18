@@ -25,5 +25,5 @@ export default defineNavbarConfig([
   },
   {text: '手撕算法题', link: '/code/README.md', icon: '/icons/code.svg'},
   {text: '面试', link: '/interview/README.md', icon: '/icons/interview.svg'},
-  {text: '生成模型', link: '/genmodel/README.md', icon: '/icons/code.svg'},
+  {text: '生成模型', link: '/genmodel/README.md', icon: '/icons/aigen.svg'},
 ])
