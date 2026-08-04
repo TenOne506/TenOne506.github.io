@@ -56,33 +56,58 @@
 <style>
 /*颜色*/
 :root {
-  /*卡片背景*/
-  --main-card-background: rgba(255, 255, 255, 0.7);
-  /*卡片边框*/
-  --main-card-border: #e3e8f7;
-  /*卡片阴影*/
-  --main-border-shadow: #1a1a1a15;
-  /*卡片 hover */
-  --about-card-hover-bg: rgba(100, 190, 190, 0.8);
-  /*按钮 背景*/
-  --home-action-bnt-bg:rgb(235, 235, 239);
-  /*语言 span 背景*/
-  --about-me-skill-item-bg: #f4f2ed;
-  /* ai 摘要 */
-  --ai-summary-shadow-color: rgba(109, 196, 196, 0.35);
-  /* 头像阴影 */
-  --avatartar-shadow-color: rgb(70, 70, 70);
+
+  /* 背景 */
+  --home-bg-light:#f8fafc;
+
+  /* 卡片 */
+  --main-card-background:
+      rgba(255,255,255,0.72);
+
+  --main-card-border:
+      #dbeafe;
+
+  --main-border-shadow:
+      rgba(15,23,42,0.08);
+
+
+  /* hover */
+  --about-card-hover-bg:
+      rgba(37,99,235,0.15);
+
+
+  --about-me-skill-item-bg:
+      #eff6ff;
 }
+
+
 [data-theme="dark"] {
-  --main-card-background: rgba(27, 28, 32, 0.7);
-  --main-card-border: #3d3d3f;
-  --main-border-shadow: #6d6d6d1e;
-  --about-card-hover-bg: rgba(100, 190, 190, 0.8);
-  --home-action-bnt-bg:rgb(50, 54, 63);
-  --about-me-skill-item-bg: #15191c;
-  --ai-summary-shadow-color: rgba(100, 190, 190, 0.2);
-  --avatartar-shadow-color: rgb(0, 0, 0);
+
+  --home-bg-dark:#09090b;
+
+
+  --main-card-background:
+      rgba(24,24,27,0.75);
+
+
+  --main-card-border:
+      #27272a;
+
+
+  --main-border-shadow:
+      rgba(0,0,0,0.4);
+
+
+  --about-card-hover-bg:
+      rgba(168,85,247,0.18);
+
+
+  --about-me-skill-item-bg:
+      #18181b;
 }
+
+/* 方案1: 网格/彗星改为蓝色数据流 */
+/* 注: canvas 选择器下方已限定作用域 */
 
 /*卡片背景*/
 .about-me-card-bg{
@@ -136,17 +161,13 @@
   overflow-y: hidden !important;
 }
 
-canvas {
-  z-index: -1;
-  position: fixed;
-  top: -1px;
-  left: -1px;
-  pointer-events: none;
-  /* 允许鼠标事件穿透 */
-  overflow: hidden;
+.grid-home-container canvas {
+ background:#f8fafc;
+}
 
 
-  background-color: rgb(233, 245, 233); /* 新增背景色 */
+[data-theme="dark"] .grid-home-container canvas {
+ background:#09090b;
 }
 
 .head-social {
@@ -272,6 +293,15 @@ const resizeCanvas = () => {
   canvas.height = window.innerHeight
 }
 
+// 融合方案: 浅色=方案1蓝, 深色=方案3紫
+const isDark = () => document.documentElement.getAttribute('data-theme') === 'dark'
+const gridColor = (alpha: number) =>
+  isDark() ? `rgba(168, 85, 247, ${alpha})` : `rgba(37, 99, 235, ${alpha})`
+const cometBase = () =>
+  isDark()
+    ? ['rgba(168, 85, 247, 0)', 'rgba(168, 85, 247, 0.3)', '#a78bfa']
+    : ['rgba(37, 99, 235, 0)', 'rgba(37, 99, 235, 0.3)', '#2563eb']
+
 const drawGrid = () => {
   const canvas = canvasRef.value
   const context = ctx.value
@@ -297,7 +327,7 @@ const drawGrid = () => {
         alpha = 0.1 + (1 - dy / radius) * 0.9
       }
     }
-    context.strokeStyle = `rgba(80, 134, 161, ${alpha})`
+    context.strokeStyle = gridColor(alpha)
     context.stroke()
   }
 
@@ -314,7 +344,7 @@ const drawGrid = () => {
         alpha = 0.1 + (1 - dx / radius) * 0.9
       }
     }
-    context.strokeStyle = `rgba(80, 134, 161, ${alpha})`
+    context.strokeStyle = gridColor(alpha)
     context.stroke()
   }
 }
@@ -348,10 +378,11 @@ const drawComet = (comet: Comet) => {
     const x = progress * canvas.width
     const y = position
 
+    const [c0, c1, c2] = cometBase()
     const gradient = context.createLinearGradient(x - length, y, x, y)
-    gradient.addColorStop(0, 'rgba(80, 134, 161, 0)')
-    gradient.addColorStop(0.4, 'rgba(80,134,161,0.3)')
-    gradient.addColorStop(1, '#4483a2')
+    gradient.addColorStop(0, c0)
+    gradient.addColorStop(0.4, c1)
+    gradient.addColorStop(1, c2)
 
     context.strokeStyle = gradient
     context.beginPath()
@@ -362,10 +393,11 @@ const drawComet = (comet: Comet) => {
     const x = position
     const y = progress * canvas.height
 
+    const [c0, c1, c2] = cometBase()
     const gradient = context.createLinearGradient(x, y - length, x, y)
-    gradient.addColorStop(0, 'rgba(80, 134, 161, 0)')
-    gradient.addColorStop(0.4, 'rgba(80,134,161,0.3)')
-    gradient.addColorStop(1, '#4483a2')
+    gradient.addColorStop(0, c0)
+    gradient.addColorStop(0.4, c1)
+    gradient.addColorStop(1, c2)
 
     context.strokeStyle = gradient
     context.beginPath()

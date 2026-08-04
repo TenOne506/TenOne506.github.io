@@ -142,8 +142,8 @@ const createParticle = (): Particle => {
   if (!canvas) throw new Error("Canvas not initialized");
 
   const color = document.documentElement.getAttribute('data-theme') === 'dark'
-    ? 'rgba(100, 190, 190, 0.7)'
-    : 'rgba(80, 134, 161, 0.7)';
+    ? 'rgba(168, 85, 247, 0.8)'
+    : 'rgba(37, 99, 235, 0.65)';
 
   // 基础速度：保持正向（向右）
 // 优化后的基础速度范围：[0.8, 1.2]，差异更小，整体更均匀
@@ -252,12 +252,10 @@ const animate = () => {
   if (!canvas || !context) return;
 
   // 时间步长
-  time.value += 0.15; 
+  time.value += 0.15;
 
-  context.fillStyle = document.documentElement.getAttribute('data-theme') === 'dark'
-    ? 'rgba(40, 58, 40, 0.08)'
-    : 'rgba(233, 245, 233, 0.08)'; 
-  context.fillRect(0, 0, canvas.width, canvas.height);
+  // 用透明清屏，露出底层背景色，避免 canvas 累积出浅绿色
+  context.clearRect(0, 0, canvas.width, canvas.height);
 
   for (let i = 0; i < particles.length; i++) {
     updateParticle(particles[i]);
@@ -280,8 +278,8 @@ const handleMouseLeave = () => {
 const handleThemeChange = () => {
     particles.forEach(p => {
         p.color = document.documentElement.getAttribute('data-theme') === 'dark'
-            ? 'rgba(100, 190, 190, 0.7)'
-            : 'rgba(80, 134, 161, 0.7)';
+            ? 'rgba(168, 85, 247, 0.8)'
+            : 'rgba(37, 99, 235, 0.65)';
     });
 };
 
@@ -327,24 +325,31 @@ onUnmounted(() => {
 */
 </script>
 
-<style scoped>
-/* --- 主题颜色变量 (保持不变) --- */
+<style>
+/* --- 主题颜色变量 (全局，必须非 scoped，否则 :root 选择器会带 data-v 属性而失效) --- */
 :root {
-  --green-bg-light: rgb(233, 245, 233);
-  --text-primary-light: #333;
-  --text-secondary-light: #666;
-  --flow-color-1-light: #4483a2;
-  --flow-color-2-light: #69F0AE;
+  --bg-light: #f8fafc;
+
+  --text-primary-light: #0f172a;
+  --text-secondary-light: #64748b;
+
+  --flow-color-1-light: #2563eb;
+  --flow-color-2-light: #06b6d4;
 }
+
 
 [data-theme="dark"] {
-  --green-bg-dark: #283a28;
-  --text-primary-dark: #e0e0e0;
-  --text-secondary-dark: #b0b0b0;
-  --flow-color-1-dark: #4483a2;
-  --flow-color-2-dark: #00BFA5;
-}
+  --bg-dark: #09090b;
 
+  --text-primary-dark: #fafafa;
+  --text-secondary-dark: #d4d4d8;
+
+  --flow-color-1-dark: #a78bfa;
+  --flow-color-2-dark: #22d3ee;
+}
+</style>
+
+<style scoped>
 /* --- 基础布局 FIX (保持不变) --- */
 .new-zephyrus-home-container-wrapper {
   min-height: 100vh;
@@ -356,13 +361,13 @@ onUnmounted(() => {
   z-index: 1; 
   box-sizing: border-box;
   
-  background-color: var(--green-bg-light); 
+  background-color: var(--bg-light);
   color: var(--text-primary-light);
   transition: background-color 0.7s ease, color 0.3s ease;
 }
 
 [data-theme="dark"] .new-zephyrus-home-container-wrapper {
-  background-color: var(--green-bg-dark);
+  background-color: var(--bg-dark);
   color: var(--text-primary-dark);
 }
 
