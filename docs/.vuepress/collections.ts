@@ -246,7 +246,7 @@ const genmodelDoc = defineCollection({
     '',
     {
       dir: '',
-      //   text: '生成模型',
+      text: '生成模型',
       items: 'auto',  // 自动生成当前目录下的条目
       collapsed: true,
     },

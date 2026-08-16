@@ -51,7 +51,8 @@ $p_t(x)$（边缘概率路径的密度）：
 - 这是在时间 $t$ 时，全空间总的概率分布。
 - 积分的含义：它是把所有可能的真实数据 $z$（从猫到狗到汽车）所对应的条件路径 $p_t(x|z)$，按照它们在现实中出现的概率 $p_{\text{data}}(z)$ 进行加权平均（叠加）。
 
-上面的积分是无法进行计算的
+上面的积分是无法进行计算的。
+
 边缘概率路径 $p_t$ 在 $p_{\text{init}}$ 和 $p_{\text{data}}$ 之间进行插值：
 
 $$
@@ -132,7 +133,7 @@ $$
 $$
 \begin{aligned}
 &\frac{\mathrm{d}}{\mathrm{d}t}\psi_t^{\text{target}}(x|z) = u_t^{\text{target}}(\psi_t^{\text{target}}(x|z)|z) \quad \text{对所有 } x,z \in \mathbb{R}^d \\
-&\Leftrightarrow \quad \dot{\alpha}_t z + \dot{\beta}_t x = u_t^{\text{target}}(\alpha_t z + \beta_t x|z) \quad \text{对所有 } x,z \in \mathbb{R}^d \\
+&\stackrel{(i)}{\Leftrightarrow} \quad \dot{\alpha}_t z + \dot{\beta}_t x = u_t^{\text{target}}(\alpha_t z + \beta_t x|z) \quad \text{对所有 } x,z \in \mathbb{R}^d \\
 &\stackrel{(ii)}{\Leftrightarrow} \quad \dot{\alpha}_t z + \dot{\beta}_t \left( \frac{x - \alpha_t z}{\beta_t} \right) = u_t^{\text{target}}(x|z) \quad \text{对所有 } x,z \in \mathbb{R}^d \\
 &\stackrel{(iii)}{\Leftrightarrow} \quad \left( \dot{\alpha}_t - \frac{\dot{\beta}_t}{\beta_t}\alpha_t \right) z + \frac{\dot{\beta}_t}{\beta_t} x = u_t^{\text{target}}(x|z) \quad \text{对所有 } x,z \in \mathbb{R}^d
 \end{aligned}
@@ -227,3 +228,68 @@ $$
 :::
 
 对于定理的证明，如下：
+
+$$
+\begin{aligned}
+\mathcal{L}_{\mathrm{FM}}(\theta) &\overset{(i)}{=} \mathbb{E}_{t \sim \mathrm{Unif}, x \sim p_t}\left[\|u_t^\theta(x) - u_t^{\mathrm{target}}(x)\|^2\right] \\
+&\overset{(ii)}{=} \mathbb{E}_{t \sim \mathrm{Unif}, x \sim p_t}\left[\|u_t^\theta(x)\|^2 - 2 u_t^\theta(x)^T u_t^{\mathrm{target}}(x) + \|u_t^{\mathrm{target}}(x)\|^2\right] \\
+&\overset{(iii)}{=} \mathbb{E}_{t \sim \mathrm{Unif}, x \sim p_t}\left[\|u_t^\theta(x)\|^2\right] - 2\mathbb{E}_{t \sim \mathrm{Unif}, x \sim p_t}\left[u_t^\theta(x)^T u_t^{\mathrm{target}}(x)\right] + \underbrace{\mathbb{E}_{t \sim \mathrm{Unif}_{[0,1]}, x \sim p_t}\left[\|u_t^{\mathrm{target}}(x)\|^2\right]}_{=: C_1} \\
+&\overset{(iv)}{=} \mathbb{E}_{t \sim \mathrm{Unif}, z \sim p_{\mathrm{data}}, x \sim p_t(\cdot|z)}\left[\|u_t^\theta(x)\|^2\right] - 2\mathbb{E}_{t \sim \mathrm{Unif}, x \sim p_t}\left[u_t^\theta(x)^T u_t^{\mathrm{target}}(x)\right] + C_1
+\end{aligned}
+$$
+
+其中第$i$ 步使用了定义。第$ii$ 步使用了完全平方公式。第$iii$ 步定义了一个常量$C$，因为这一项是完全不含$\theta$的。
+第$iv$ 步使用了之前的采样来重写第一项。下面我们来重新表达下第二项的内容。
+
+$$
+\begin{aligned}
+\mathbb{E}_{t \sim \mathrm{Unif}, x \sim p_t}\left[u_t^\theta(x)^T u_t^{\mathrm{target}}(x)\right] &\overset{(i)}{=} \int_0^1 \int p_t(x) u_t^\theta(x)^T u_t^{\mathrm{target}}(x) \, \mathrm{d}x \, \mathrm{d}t \\
+&\overset{(ii)}{=} \int_0^1 \int p_t(x) u_t^\theta(x)^T \left[ \int u_t^{\mathrm{target}}(x|z) \frac{p_t(x|z) p_{\mathrm{data}}(z)}{p_t(x)} \, \mathrm{d}z \right] \, \mathrm{d}x \, \mathrm{d}t \\
+&\overset{(iii)}{=} \int_0^1 \int \int u_t^\theta(x)^T u_t^{\mathrm{target}}(x|z) p_t(x|z) p_{\mathrm{data}}(z) \, \mathrm{d}z \, \mathrm{d}x \, \mathrm{d}t \\
+&\overset{(iv)}{=} \mathbb{E}_{t \sim \mathrm{Unif}, z \sim p_{\mathrm{data}}, x \sim p_t(\cdot|z)}\left[u_t^\theta(x)^T u_t^{\mathrm{target}}(x|z)\right]
+\end{aligned}
+$$
+
+第一步将表达式展开为积分。第二步使用了之前的公式，将边缘向量场表示为条件向量场的积分形式。第三步利用了积分的线性规则，重新排列的积分顺序。
+第四步将积分重新写成期望的形式。这是非常重要的一步证明，开始的时候是边缘向量场，结束的时候是条件向量场。我们把这个加到流匹配损失中去。
+
+$$
+\begin{aligned}
+\mathcal{L}_{\mathrm{FM}}(\theta) 
+&\overset{(i)}{=} \mathbb{E}_{t \sim \mathrm{Unif}, z \sim p_{\mathrm{data}}, x \sim p_t(\cdot|z)} \left[ \|u_t^\theta(x)\|^2 - 2 \mathbb{E}_{t \sim \mathrm{Unif}, z \sim p_{\mathrm{data}}, x \sim p_t(\cdot|z)} \left[ u_t^\theta(x)^T u_t^{\mathrm{target}}(x|z) \right] + C_1 \right. \\
+&\overset{(ii)}{=} \mathbb{E}_{t \sim \mathrm{Unif}, z \sim p_{\mathrm{data}}, x \sim p_t(\cdot|z)} \left[ \|u_t^\theta(x)\|^2 - 2 u_t^\theta(x)^T u_t^{\mathrm{target}}(x|z) + \|u_t^{\mathrm{target}}(x|z)\|^2 - \|u_t^{\mathrm{target}}(x|z)\|^2 \right] + C_1 \\
+&\overset{(iii)}{=} \mathbb{E}_{t \sim \mathrm{Unif}, z \sim p_{\mathrm{data}}, x \sim p_t(\cdot|z)} \left[ \|u_t^\theta(x) - u_t^{\mathrm{target}}(x|z)\|^2 \right] + \underbrace{ \mathbb{E}_{t \sim \mathrm{Unif}, z \sim p_{\mathrm{data}}, x \sim p_t(\cdot|z)} \left[ -\|u_t^{\mathrm{target}}(x|z)\|^2 \right] }_{C_2} + C_1 \\
+&\overset{(iv)}{=} \mathcal{L}_{\mathrm{CFM}}(\theta) + \underbrace{C_2 + C_1}_{=: C}
+\end{aligned}
+$$
+第一步展开，是把第二项写成前面推导的形式。第二步是加一个，减一个。
+第三步是利用了，完全平方公式的逆向使用。第四步，利用定义，
+前面第一项就是条件流匹配损失，后面两项不含 $\theta$ 相当于常数了。
+
+
+因此，流匹配训练归结为最小化条件流匹配损失关于该算法，有以下几个显著特点：
+
+第一，我们在训练过程中实际上从不模拟任何常微分方程（ODE）。人们将算法的这一特性称为无模拟（simulation-free）。这使得训练成本极低，因为你无需在训练过程中展开ODE的轨迹（这需要很多步迭代）。
+
+第二，训练目标是一个简单的回归目标——我们只是对目标向量场 $( u_t^{\text{target}}(x|z) )$进行回归。因此，它本质上与监督学习没有太大区别。
+
+最后，该算法极其简单——很难想象有比这更简单的训练目标了。
+
+所有这些特点使得流匹配成为大规模机器学习模型中极具吸引力的方法。一旦$( u_t^\theta )$ 训练完成，我们就可以通过例如算法1的方式模拟流模型
+
+$$
+dX_t = u_t^\theta(X_t) dt, \quad X_0 \sim p_{\text{init}} \tag{27}
+$$
+
+从而获得样本$( X_1 \sim p_{\text{data}})$。
+
+::: info 总结
+流匹配训练旨在学习边际向量场（marginal vector field）$u_t^{\text{target}}$。为了构建它，我们选择满足条件 $p_0(\cdot|z) = p_{\text{init}}$ 和 $p_1(\cdot|z) = \delta_z$ 的条件概率路径（conditional probability path）$p_t(x|z)$。接下来，我们寻找一个条件向量场（conditional vector field）$u_t^{\text{target}}(x|z)$，使其对应的流（flow）$\psi_t^{\text{target}}(x|z)$ 满足：
+$$X_0 \sim p_{\text{init}} \quad \Rightarrow \quad X_t = \psi_t^{\text{target}}(X_0|z) \sim p_t(\cdot|z),$$
+或者等价地，满足 $u_t^{\text{target}}$ 符合连续性方程（continuity equation）。然后，由以下公式定义的边际向量场（marginal vector field）：
+$$u_t^{\text{target}}(x) = \int u_t^{\text{target}}(x|z) \frac{p_t(x|z)p_{\text{data}}(z)}{p_t(x)} dz $$
+遵循边际概率路径，即：
+$$X_0 \sim p_{\text{init}}, \quad dX_t = u_t^{\text{target}}(X_t)dt \Rightarrow X_t \sim p_t \quad (0 \le t \le 1). $$
+特别是对于该常微分方程（ODE），有 $X_1 \sim p_{\text{data}}$，因此正如预期的那样，$u_t^{\text{target}}$ “将噪声转化为数据（converts noise into data）”。为了学习它，我们需要最小化条件流匹配损失（conditional flow matching loss）：
+$$\mathcal{L}_{\text{CFM}}(\theta) = \mathbb{E}_{t\sim\text{Unif}, z\sim p_{\text{data}}, x\sim p_t(\cdot|z)} [\|u_t^\theta(x) - u_t^{\text{target}}(x|z)\|^2].$$
+:::
